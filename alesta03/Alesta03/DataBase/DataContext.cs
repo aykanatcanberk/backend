@@ -12,7 +12,7 @@ namespace Alesta03.DataBase
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseNpgsql("Server=localhost;Database=alesta3;port=5432;Username=postgres;Password=admin;");
+            optionsBuilder.UseNpgsql("Server=localhost;Database=backend;port=5432;Username=postgres;Password=admin;");
         }
 
 
