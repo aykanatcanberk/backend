@@ -1,4 +1,5 @@
 global using Alesta03.Model;
+global using Alesta03.DataBase;
 using Alesta03.Services.PersonServices.ExpReviewService;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -14,6 +15,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddDbContext<DataContext>();
 builder.Services.AddScoped<IExpReviewService, ExpReviewService>();
 
 builder.Services.AddSwaggerGen(options =>
