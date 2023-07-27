@@ -1,4 +1,5 @@
-﻿using Alesta03.Model;
+﻿using Alesta03.Request.DtoRequest;
+using Alesta03.Request.RgeisterRequest;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,6 +13,10 @@ namespace Alesta03.Controllers.GeneralController
     public class AuthController : ControllerBase
     {
         public static User user = new User();
+        public static Company company = new Company();
+        public static Person person = new Person();
+        public static RegisterRequestUC RegisterRequest { get; set; }
+
         private readonly IConfiguration _configuration;
 
         public AuthController(IConfiguration configuration)
@@ -20,15 +25,32 @@ namespace Alesta03.Controllers.GeneralController
         }
 
 
-        [HttpPost("register")]
-        public ActionResult<User> Register(UserDto request)
+        [HttpPost("registerCompany")]
+        public ActionResult<User> RegisterCompany(RegisterRequestUC request)
         {
             string passwordHash
-                = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                = BCrypt.Net.BCrypt.HashPassword(request.UserDto.Password);
+
+            company.Name = request.CompanyDto.Name;
+                      
+            user.Email = request.UserDto.Email;
+            user.UserType = request.UserDto.UserType;
+            user.PasswordHash = passwordHash;
+
+            return Ok(user);
+        }
+        [HttpPost("registerPerson")]
+        public ActionResult<User> RegisterPerson(RegisterRequestUP request)
+        {
+            string passwordHash
+                = BCrypt.Net.BCrypt.HashPassword(request.UserDto.Password);
 
 
-            user.Email = request.Email;
-            user.UserType = request.UserType;
+            person.Name = request.PersonDto.Name;
+            person.Surname = request.PersonDto.Surname;
+
+            user.Email = request.UserDto.Email;
+            user.UserType = request.UserDto.UserType;
             user.PasswordHash = passwordHash;
 
             return Ok(user);
@@ -78,7 +100,6 @@ namespace Alesta03.Controllers.GeneralController
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwt;
-            ;
         }
     }
 }

@@ -7,10 +7,10 @@
         public string PasswordHash { get; set; }
         public string UserType { get; set; }
 
-        public List<Company> companies { get; set; }
-        public List<Person> people { get; set; }
+        public List<Company> Companies { get; set; }
+        public List<Person> People { get; set; }
 
-        public Roles roles { get; set; }
-        public string rolesId { get; set; }
+        public Roles Roles { get; set; }
+        public string RolesId { get; set; }
     }
 }
