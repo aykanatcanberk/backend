@@ -2,16 +2,24 @@
 using Alesta03.Model.Response;
 using Alesta03.Request;
 using Alesta03.Response;
+﻿using Alesta03.Request.AddRequest;
+using Alesta03.Request.UpdateRequest;
+using Alesta03.Response.AddResponse;
+using Alesta03.Response.DeleteResponse;
+using Alesta03.Response.GetResponse;
+using Alesta03.Response.UpdateResponse;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alesta03.Services.PersonServices.ExpReviewService
 {
     public interface IExpReviewService
     {
+        //GetReviewResponse GetAllReviews();
         List<ExpReviews> GetAllReviews();
-        ExpReviews? GetSingleReviews(int id);
+        GetReviewResponse? GetSingleReviews(int id);
         AddReviewResponse AddReview(AddReviewRequest request);
-        List<ExpReviews>? UpdateReview(int id, ExpReviews request);
-        List<ExpReviews>? DeleteReview(int id);
-
+        UpdateReviewResponse? UpdateReview(int id, UpdateReviewRequest request);
+        DeleteReviewResponse? DeleteReview(int id);
     }
 }
+

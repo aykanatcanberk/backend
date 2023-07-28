@@ -1,5 +1,6 @@
-﻿using Alesta03.Model.Request;
-using Alesta03.Request;
+
+﻿using Alesta03.Request.AddRequest;
+using Alesta03.Request.UpdateRequest;
 using Alesta03.Services.PersonServices.ExpReviewService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,10 @@ namespace Alesta03.Controllers.PersonController
         [HttpGet/*, Authorize(Roles = Roles.User)*/]
         public async Task<ActionResult<List<ExpReviews>>> GetAllReviews()
         {
-            return _expReviewSercive.GetAllReviews();
+            var result=_expReviewSercive.GetAllReviews();
+            return Ok(result);
         }
+
 
         [HttpGet("{id}")/*, Authorize(Roles = Roles.User)*/]
         public async Task<ActionResult<ExpReviews>> GetSingleReviews(int id)
@@ -43,7 +46,7 @@ namespace Alesta03.Controllers.PersonController
         }
 
         [HttpPut("{id}")/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<List<ExpReviews>>> UpdateReview(int id, ExpReviews request)
+        public async Task<ActionResult<List<ExpReviews>>> UpdateReview(int id, UpdateReviewRequest request)
         {
             var result = _expReviewSercive.UpdateReview(id, request);
             if (result == null)
@@ -58,8 +61,8 @@ namespace Alesta03.Controllers.PersonController
             var result = _expReviewSercive.DeleteReview(id);
             if (result == null)
                 return NotFound("Yorum Bulunumadı!");
-
-            return Ok(result);
+            string m = _expReviewSercive.DeleteReview(id).Message;
+            return Ok(m);
         }
 
     }

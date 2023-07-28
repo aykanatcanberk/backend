@@ -31,7 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\CompanyServices\" />
+    <Folder Include="Request\DeleteRequest\" />
+    <Folder Include="Request\GetRequest\" />
   </ItemGroup>
 
 </Project>

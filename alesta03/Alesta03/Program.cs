@@ -1,8 +1,9 @@
 global using Alesta03.Model;
-global using Alesta03.DataBase;
-global using Alesta03.Services;
-global using Alesta03.Services.AdvertServices;
+using Alesta03.Services.CompanyServices.InfoService;
+using Alesta03.Services.CompanyServices.ProfileService;
 using Alesta03.Services.PersonServices.ExpReviewService;
+using Alesta03.Services.PersonServices.InfoService;
+using Alesta03.Services.PersonServices.ProfileService;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -22,6 +23,12 @@ builder.Services.AddDbContext<DataContext>();
 builder.Services.AddScoped<IExpReviewService, ExpReviewService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IAdvertService, AdvertService>();
+builder.Services.AddScoped<ICProfileService, CProfileService>();
+builder.Services.AddScoped<IPProfileService, PProfileService>();
+builder.Services.AddScoped<IPersonInfoWorkService, PersonInfoWorkService>();
+builder.Services.AddScoped<ICompanyInfoService, CompanyInfoService>();
+builder.Services.AddScoped<IPersonInfoEduService, PersonInfoEduService>();
+
 
 builder.Services.AddSwaggerGen(options =>
 {
