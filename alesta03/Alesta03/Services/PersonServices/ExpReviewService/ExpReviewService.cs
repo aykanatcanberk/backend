@@ -1,6 +1,8 @@
 ﻿using Alesta03.Model;
 using Alesta03.Model.Request;
 using Alesta03.Model.Response;
+using Alesta03.Request;
+using Alesta03.Response;
 
 namespace Alesta03.Services.PersonServices.ExpReviewService
 {
@@ -30,8 +32,6 @@ namespace Alesta03.Services.PersonServices.ExpReviewService
             model.Title = request.Title;
             model.Description = request.Description;
             model.Date = DateTime.Now;
-
-
 
             expReview.Add(model);
 

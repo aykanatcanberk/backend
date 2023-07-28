@@ -12,6 +12,9 @@
         public User users { get; set; }
         public string usersId { get; set; }
 
-        public ICollection<ExpReviews> reviews { get; set; }
+        public List<ExpReviews> Reviews { get; set; }
+        public User User { get; set; }
+        public List<Advert> Adverts { get; set; }
+
     }
 }

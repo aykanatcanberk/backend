@@ -12,5 +12,10 @@
 
         public Roles roles { get; set; }
         public string rolesId { get; set; }
+        public List<Post> Posts{ get; set; }
+        public Person Person { get; set; }
+        public List<Advert>Adverts { get; set; }
+        public List<Company> Companies { get; set; }
+
     }
 }

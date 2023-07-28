@@ -1,10 +1,13 @@
 global using Alesta03.Model;
 global using Alesta03.DataBase;
+global using Alesta03.Services;
+global using Alesta03.Services.AdvertServices;
 using Alesta03.Services.PersonServices.ExpReviewService;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using Alesta03.Services.PostServices;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +20,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>();
 builder.Services.AddScoped<IExpReviewService, ExpReviewService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IAdvertService, AdvertService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
