@@ -1,4 +1,4 @@
-﻿namespace Alesta03.Model
+namespace Alesta03.Model
 {
     public class Person
     {
@@ -14,8 +14,9 @@
         public string UsersId { get; set; }
 
         public List<ExpReviews> Reviews { get; set; }
-
+        public List<Advert> Adverts { get; set; }
         public List<EduStatus> EduStatuses { get; set; }
         public List<WorkStatus> WorkStatuses { get; set; }
+
     }
 }

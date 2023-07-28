@@ -10,7 +10,11 @@
         public List<Company> Companies { get; set; }
         public List<Person> People { get; set; }
 
-        public Roles Roles { get; set; }
-        public string RolesId { get; set; }
+        public Roles roles { get; set; }
+        public string rolesId { get; set; }
+        
+        public List<Post> Posts{ get; set; }
+
+
     }
 }

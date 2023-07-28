@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using Alesta03.Services.PostServices;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,11 +21,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>();
 builder.Services.AddScoped<IExpReviewService, ExpReviewService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IAdvertService, AdvertService>();
 builder.Services.AddScoped<ICProfileService, CProfileService>();
 builder.Services.AddScoped<IPProfileService, PProfileService>();
 builder.Services.AddScoped<IPersonInfoWorkService, PersonInfoWorkService>();
 builder.Services.AddScoped<ICompanyInfoService, CompanyInfoService>();
 builder.Services.AddScoped<IPersonInfoEduService, PersonInfoEduService>();
+
 
 builder.Services.AddSwaggerGen(options =>
 {
