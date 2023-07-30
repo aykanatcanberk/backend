@@ -29,15 +29,21 @@ namespace Alesta03.Services.PostServices
             model.PostDate = DateTime.Now;
 
 
-            _context.Posts.Add(model);
-            await _context.SaveChangesAsync();
+            
 
             AddPostResponse response = new AddPostResponse();
             response.Id=model.Id; 
-            response.UserId = model.UserId;
+            response.UserId = (int)model.UserId;
             response.PostDate =model.PostDate;
             response.Content = model.Content;
+
+
+            _context.Posts.Add(model);
+            await _context.SaveChangesAsync();
+
             return response;
+
+            
         }
 
         public async Task<List<GetAllPostResponse>> GetAllPosts()
@@ -47,7 +53,7 @@ namespace Alesta03.Services.PostServices
             var responseList = posts.Select(post => new GetAllPostResponse
             {
                 Id = post.Id,
-                UserId = post.UserId,
+                UserId = (int)post.UserId,
                 Content = post.Content,
                 PostDate = post.PostDate
             }).ToList();
@@ -89,7 +95,7 @@ namespace Alesta03.Services.PostServices
                 return null;
             GetPostResponse response = new GetPostResponse();
             response.Id = model.Id;
-            response.UserId = model.UserId;
+            response.UserId = (int)model.UserId;
             response.Content = model.Content;
             response.PostDate = model.PostDate;
             return response;

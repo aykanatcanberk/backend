@@ -19,6 +19,7 @@ namespace Alesta03.Model
 
         public List<Company> Companies { get; set; }
         public List<Person> People { get; set; }
+        public List<Post>Posts { get; set; }
 
     }
 }

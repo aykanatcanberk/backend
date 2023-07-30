@@ -44,7 +44,7 @@ namespace Alesta03.Controllers.GeneralController
         [HttpPost/*, Authorize(Roles = Roles.User)*/]
         public async Task<ActionResult<List<Post>>> AddPost(AddPostRequest request)
         {
-            var result = await _postService.AddPost(request);
+            var result = await _postService.AddPost(request);//sorun
             return Ok(result);
         }
 
