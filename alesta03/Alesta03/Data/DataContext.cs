@@ -25,5 +25,8 @@ namespace Alesta03.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WorkStatus> WorkStatuses { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Advert> Adverts { get; set; }
+        public DbSet<AdvertApproval> AdvertApprovals { get; set; }
     }
 }
