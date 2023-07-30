@@ -10,6 +10,8 @@ namespace Alesta03.Model
         public int ID { get; set; }
         public string CompanyName { get; set; }
         public string DepartmentName { get; set; }
+        public int EmployeeID { get; set; }
+        public string AppLetter { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
 
