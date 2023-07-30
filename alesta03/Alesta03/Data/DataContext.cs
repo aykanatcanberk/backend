@@ -13,6 +13,7 @@ namespace Alesta03.Data
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=vizyonergenc03;Username=postgres;Password=354354;");
+
         }
 
         public DbSet<Approval>  Approvals { get; set; }
@@ -25,5 +26,8 @@ namespace Alesta03.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WorkStatus> WorkStatuses { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Advert> Adverts { get; set; }
+        public DbSet<AdvertApproval> AdvertApprovals { get; set; }
     }
 }

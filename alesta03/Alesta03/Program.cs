@@ -9,6 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using Alesta03.Services.AdvertApprovalService;
+using Alesta03.Services.AdvertService;
+using Alesta03.Services.PostServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,9 @@ builder.Services.AddScoped<IPProfileService, PProfileService>();
 builder.Services.AddScoped<IPersonInfoWorkService, PersonInfoWorkService>();
 builder.Services.AddScoped<IPersonInfoEduService, PersonInfoEduService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPostService, PostService>();    
+builder.Services.AddScoped<IAdvertService, AdvertService>();
+builder.Services.AddScoped<IAdvertApprovalService, AdvertApprovalService>();
 
 builder.Services.AddDbContext<DataContext>();
 
