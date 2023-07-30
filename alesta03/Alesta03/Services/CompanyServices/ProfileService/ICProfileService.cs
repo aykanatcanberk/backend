@@ -11,6 +11,6 @@ namespace Alesta03.Services.CompanyServices.ProfileService
         Task<List<Company>> GetAllProfiles();
         Task<Company?> GetSingleProfiles(int id);
         Task<UpdateCProfileResponse?> UpdateProfile(int id, UpdateCProfileRequest request);
-        Task<AddCProfileResponse> AddProfileInfo(AddCProfileRequest request);
+        //Task<AddCProfileResponse> AddProfileInfo(AddCProfileRequest request);
     }
 }

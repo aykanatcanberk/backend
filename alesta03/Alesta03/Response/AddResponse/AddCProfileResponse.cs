@@ -12,6 +12,7 @@
         public string Prof { get; set; }
         public string Phone { get; set; }
         public string Website { get; set; }
-        
+        public int? UsersId { get; set; }
+
     }
 }
