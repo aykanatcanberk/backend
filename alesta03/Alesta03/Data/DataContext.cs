@@ -1,4 +1,5 @@
-﻿global using Microsoft.EntityFrameworkCore;
+﻿
+global using Microsoft.EntityFrameworkCore;
 
 namespace Alesta03.Data
 {
@@ -6,7 +7,8 @@ namespace Alesta03.Data
     {
         public DataContext(DbContextOptions<DataContext> options): base(options)
         {
-            
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

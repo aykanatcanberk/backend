@@ -1,5 +1,7 @@
 ﻿using Alesta03.Request.AdvetRequest;
 using Alesta03.Request.PostRequest;
+using Alesta03.Response.AdvertResponse;
+using Alesta03.Response.PostResponse;
 using Alesta03.Services.AdvertService;
 using Alesta03.Services.PostServices;
 using Microsoft.AspNetCore.Authorization;
@@ -12,49 +14,114 @@ namespace Alesta03.Controllers.GeneralController
     [ApiController]
     public class AdvertController : ControllerBase
     {
-        private readonly IAdvertService _advertService;
+        private readonly DataContext _context;
 
-        public AdvertController(IAdvertService advertService)
+        public AdvertController(DataContext context)
         {
-            _advertService = advertService;
+            _context = context;
         }
-
 
         [HttpGet]
         public async Task<ActionResult<Advert>> GetAllAdvert()
         {
-            var result = await _advertService.GetAllAdvert();
+            var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
+            var responseList = adverts.Select(advert => new GetAllAdvertResponse
+            {
+                Id = advert.Id,
+                UserId = advert.UserId,
+                CompanyName = advert.CompanyName,
+                AdvertName = advert.AdvertName,
+                AdvertDate = advert.AdvertDate,
+                Description = advert.Description,
+                AdvertType = advert.AdvertType,
+                Department = advert.Department,
+                WorkType = advert.WorkType,
+                WorkPreference = advert.WorkPreference
+            }).ToList();
+            return Ok(responseList);
 
-            if (result == null || result.Count == 0)
-                return NotFound("İlan bulunamadı.");
-            return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"),Authorize]
         public async Task<ActionResult<Advert>> GetSingleAdvert(int id)
         {
-            var result = await _advertService.GetSingleAdvert(id);
-            if (result == null)
-                return NotFound("İlan Bulunamadı.");
+            var model = await _context.Adverts.FindAsync(id);
+            var control = model.IsDeleted;
 
-            return Ok(result);
+            if (model is null)
+                return null;
+            if (control is true)
+                return null;
+            GetAdvertResponse response = new GetAdvertResponse();
+            response.Id = model.Id;
+            response.UserId = model.UserId;
+            response.CompanyName = model.CompanyName;
+            response.AdvertName = model.AdvertName;
+            response.AdvertDate = model.AdvertDate;
+            response.Description = model.Description;
+            response.AdvertType = model.AdvertType;
+            response.Department = model.Department;
+            response.WorkType = model.WorkType;
+            response.WorkPreference = model.WorkPreference;
+            return Ok(response);
         }
 
-        [HttpPost/*, Authorize(Roles = Role.Admin)*/]
+        [HttpPost, Authorize(Roles = Role.Admin)]
         public async Task<ActionResult<List<Advert>>> AddAdvert(AddAdvertRequest request)
         {
-            var result = await _advertService.AddAdvert(request);
-            return Ok(result);
+            var userMail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
+            var id = user?.ID;
+            if (user == null)
+                return NotFound("Kullanıcı Bulunumadı!");
+
+            var model = _context.Adverts.FirstOrDefault(x => x.UserId == id);
+            if (model is not null) return NotFound("Daha Bu Post Atılmış.");
+
+            model.UserId = id;
+            model.CompanyName = request.CompanyName;
+            model.AdvertName = request.AdvertName;
+            model.AdvertDate = DateTime.Now;
+            model.Description = request.Description;
+            model.AdvertType = request.AdvertType;
+            model.Department = request.Department;
+            model.WorkType = request.WorkType;
+            model.WorkPreference = request.WorkPreference;
+
+            _context.Adverts.Add(model);
+            await _context.SaveChangesAsync();
+
+            AddAdvertResponse response = new AddAdvertResponse();
+            response.UserId = model.UserId;
+            response.CompanyName = model.CompanyName;
+            response.AdvertName = model.AdvertName;
+            response.AdvertDate = model.AdvertDate;
+            response.Description = model.Description;
+            response.AdvertType = model.AdvertType;
+            response.Department = model.Department;
+            response.WorkType = model.WorkType;
+            response.WorkPreference = model.WorkPreference;
+
+            return Ok(response);
         }
 
 
         [HttpDelete("{id}")/*, Authorize(Roles = Role.Admin)*/]
         public async Task<ActionResult<List<Advert>>> DeleteAdvert(int id)
         {
-            var result = await _advertService.DeleteAdvert(id);
-            if (result == null)
-                return NotFound("İlan bulunamadı.");
-            return Ok(result);
+            Advert model = new Advert();
+            var control = model.IsDeleted;
+            var review = await _context.Adverts.FindAsync(id);
+            if (review is null)
+                return null;
+            if (control is true)
+                return null;
+            model.IsDeleted = review.IsDeleted;
+            model.IsDeleted = true;
+
+            DeleteAdvertResponse response = new DeleteAdvertResponse();
+            await _context.SaveChangesAsync();
+            return Ok(response);
         }
     }
 }

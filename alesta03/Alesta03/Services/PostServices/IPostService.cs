@@ -15,10 +15,13 @@ namespace Alesta03.Services.PostServices
         //GetPostResponse? GetSinglePost(int id);
         //AddPostResponse AddPost(AddPostRequest request);
         //DeletePostResponse? DeletePost(int id);
-        Task<List<GetAllPostResponse>> GetAllPosts();
-        Task<GetPostResponse?> GetSinglePost(int id);
-        Task<AddPostResponse> AddPost(AddPostRequest request);
-        Task<DeletePostResponse?> DeletePost(int id);
+
+
+
+        //Task<List<GetAllPostResponse>> GetAllPosts();
+        //Task<GetPostResponse?> GetSinglePost(int id);
+        //Task<AddPostResponse> AddPost(AddPostRequest request);
+        //Task<DeletePostResponse?> DeletePost(int id);
     }
 }
 
