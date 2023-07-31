@@ -1,5 +1,11 @@
-﻿using Alesta03.Request.UpdateRequest;
+﻿using Alesta03.Model;
+using Alesta03.Request.AddRequest;
+using Alesta03.Request.UpdateRequest;
+using Alesta03.Response.AddResponse;
+using Alesta03.Response.GetResponse;
+using Alesta03.Response.UpdateResponse;
 using Alesta03.Services.PersonServices.ProfileService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,36 +15,102 @@ namespace Alesta03.Controllers.PersonController
     [ApiController]
     public class PersonProfileController : ControllerBase
     {
-        private readonly IPProfileService _profileService;
-
-        public PersonProfileController(IPProfileService profileService)
+        private readonly DataContext _context;
+        public PersonProfileController(DataContext context)
         {
-            _profileService = profileService;
+            _context = context;
         }
-        [HttpGet/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<List<Person>>> GetAllPeople()
+        
+        [HttpGet,Authorize(Roles = Role.User)]
+        public async Task<ActionResult<Person>> GetSinglePerson()
         {
-            return await _profileService.GetAllPeople();
+            var mail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
+            var id = user?.ID;
+            if (user == null)
+                return NotFound("Kişi Bulunumadı!");
+
+            var model = _context.People.FirstOrDefault(x => x.UsersId == id);
+            if (model == null) return NotFound("Kişi Bilgisi Bulunamadı!");
+
+            GetPersonProfileResponse response = new GetPersonProfileResponse();
+
+            response.Name = model.Name;
+            response.Surname = model.Surname;
+            response.Birthday = model.Birthday;
+            response.Phone = model.Phone;
+            response.Location = model.Location;
+
+            return Ok(response);
         }
 
-        [HttpGet("{id}")/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<Person>> GetSinglePerson(int id)
+        [HttpPut,Authorize(Roles = Role.User)]
+        public async Task<ActionResult<List<Person>>> UpdateProfile(UpdatePProfileRequest request)
         {
-            var result = await _profileService.GetSinglePerson(id);
-            if (result == null)
-                return NotFound("Kullanıcı Bulunumadı!");
+            var userMail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
+            var id = user?.ID;
 
-            return Ok(result);
+            if (user == null)
+                return NotFound("Kişi Bulunumadı!");
+
+            var model = _context.People.FirstOrDefault(x => x.UsersId == id);
+            if (model == null) return NotFound("Kişi Bilgisi Bulunamadı!");
+
+            model.Name = request.Name;
+            model.Surname= request.Surname;
+            model.Birthday = request.Birthday;
+            model.Phone = request.Phone;
+            model.Location = request.Location;
+
+            UpdatePProfileResponse response = new UpdatePProfileResponse();
+
+            response.Name = model.Name;
+            response.Surname = model.Surname;
+            response.Birthday = model.Birthday;
+            response.Phone = model.Phone;
+            response.Location = model.Location;
+            response.UpdateDate = model.UpdateDate;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(response);
         }
 
-        [HttpPut("{id}")/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<List<Person>>> UpdateProfile(int id, UpdatePProfileRequest request)
-        {
-            var result = await _profileService.UpdateProfile(id, request);
-            if (result == null)
-                return NotFound("Kullanıcı Bulunumadı!");
+        [HttpPost, Authorize(Roles = Role.User)]
 
-            return Ok(result);
+        public async Task<ActionResult<List<Person>>> AddProfileInfo(AddPProfileRequest request)
+        {
+            var userMail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
+            var id = user?.ID;
+
+            if (user == null)
+                return NotFound("Kişi Bulunumadı!");
+
+
+            Person model = new Person();
+                                   
+            model.UsersId = id;
+            model.Name = request.Name;
+            model.Surname = request.Surname;
+            model.Birthday = request.Birthday;
+            model.Phone = request.Phone;
+            model.Location = request.Location;
+
+            _context.People.Add(model);
+            await _context.SaveChangesAsync();
+
+            AddPProfileResponse response = new AddPProfileResponse();
+
+            response.Name = model.Name;
+            response.Surname = model.Surname;
+            response.Birthday = model.Birthday;
+            response.Phone = model.Phone;
+            response.Location = model.Location;
+            response.UsersId = model.UsersId;
+
+            return Ok(response);
         }
     }
 }

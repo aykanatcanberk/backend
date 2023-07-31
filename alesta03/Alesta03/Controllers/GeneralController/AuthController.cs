@@ -45,6 +45,10 @@ namespace Alesta03.Controllers.GeneralController
         [HttpPost("registerPerson")]
         public async Task<ActionResult<User>> RegisterPerson(RegisterRequestUP request)
         {
+            if (_context.Users.Any(u => u.Email == request.UserDto.Email))
+            {
+                return BadRequest("E-Posta daha önce kaydedilmiş!");
+            }
             var result = await _authService.RegisterPerson(request);
             return result;
         }
@@ -53,16 +57,22 @@ namespace Alesta03.Controllers.GeneralController
         public ActionResult<User> Login(UserDto request)
         {
             var user = _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            
+            if (user.Result is null) 
+            {
+                return BadRequest("Kullanıcı  Bulunamadı!"); 
+            }
+
             if (user is null)
             {
-                return BadRequest("Kullanıcı Bulunamadı!");
+                return BadRequest("Kullanıcı  Bulunamadı!");
             }
 
             else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Result.PasswordHash))
             {
                 return BadRequest("Yanlış Şifre!");
             }
-            else if (user.Result.UserType != request.UserType)
+            else if (user.Result.UserType != user.Result.UserType)
             {
                 return BadRequest("Kullanıcı Türünüz Yanlış!");
             }
@@ -102,13 +112,13 @@ namespace Alesta03.Controllers.GeneralController
         }
 
 
-        [HttpGet,Authorize]
-        public ActionResult<string> GetMyMail()
-        {
-            var userMail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u =>u.Email == userMail);
-            var id = user.ID;
-            return Ok(id);
-        }
+        //[HttpGet, Authorize]
+        //public ActionResult<string> GetMyMail()
+        //{
+        //    var userMail = User?.Identity?.Name;
+        //    var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
+        //    var id = user.ID;
+        //    return Ok(id);
+        //}
     }
 }
