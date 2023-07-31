@@ -12,6 +12,7 @@ using System.Text;
 using Alesta03.Services.AdvertApprovalService;
 using Alesta03.Services.AdvertService;
 using Alesta03.Services.PostServices;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IExpReviewService, ExpReviewService>();
-builder.Services.AddScoped<ICProfileService, CProfileService>();
+//builder.Services.AddScoped<ICProfileService, CProfileService>();
 builder.Services.AddScoped<IPProfileService, PProfileService>();
 builder.Services.AddScoped<IPersonInfoWorkService, PersonInfoWorkService>();
 builder.Services.AddScoped<IPersonInfoEduService, PersonInfoEduService>();
@@ -44,6 +45,9 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+
+//builder.Services.AddDbContext<DataContext>(options =>
+//        options.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionStrings:Connection")));
 
 builder.Services.AddAuthentication().AddJwtBearer(options =>
 {

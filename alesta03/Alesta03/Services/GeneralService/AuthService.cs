@@ -37,7 +37,7 @@ namespace Alesta03.Services.GeneralService
             company.Name = request.CompanyDto.Name;
 
             user.Email = request.UserDto.Email;
-            user.UserType = request.UserDto.UserType;
+            user.UserType = "Company";
             user.PasswordHash = passwordHash;
 
             _context.Users.Add(user);
@@ -63,7 +63,7 @@ namespace Alesta03.Services.GeneralService
             person.Surname = request.PersonDto.Surname;
 
             user.Email = request.UserDto.Email;
-            user.UserType = request.UserDto.UserType;
+            user.UserType = "Person";
             user.PasswordHash = passwordHash;
 
             _context.Users.Add(user);   
@@ -76,12 +76,13 @@ namespace Alesta03.Services.GeneralService
         public async Task<ActionResult<string>> Login(UserDto request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            
 
             if (user.Email != request.Email) 
                 return null;
             else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash)) 
                 return null;
-            else if (user.UserType != request.UserType) 
+            else if (user.UserType != user.UserType) 
                 return null;
             
             if(user.IsFirstLogin is true)
@@ -93,6 +94,7 @@ namespace Alesta03.Services.GeneralService
 
             return token;
         }
+
 
         private string CreateToken(User user)
         {
