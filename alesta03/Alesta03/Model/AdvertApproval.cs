@@ -16,10 +16,8 @@ namespace Alesta03.Model
         public float AppAvg { get; set; }
         public string ?Status { get; set; } = "Henüz başvuru yapılmadı.";
         public DateTime ApproveDate { get; set; }
-        public bool IsDeleted { get; set; }
-        
-        public User Users { get; set; } 
-        
+        public bool IsDeleted { get; set; } 
+        public User Users { get; set; }   
         public Advert Advert { get; set; }
 
     }

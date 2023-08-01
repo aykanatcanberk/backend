@@ -26,7 +26,7 @@ namespace Alesta03.Controllers.GeneralController
         public async Task<ActionResult<Advert>> GetAllAdvertPerson()
         {
             var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
-            var responseList = adverts.Select(advert => new GetAllAdvertResponse
+            var responseList = adverts.Select(advert => new GetAllAdvertPersonResponse
             {
                 CompanyName = advert.CompanyName,
                 AdvertName = advert.AdvertName,
@@ -43,8 +43,8 @@ namespace Alesta03.Controllers.GeneralController
         public async Task<ActionResult<Advert>> GetAllAdvertCompany()
         {
             var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
-            var responseList = adverts.Select(advert => new GetAllAdvertResponse
-            {
+            var responseList = adverts.Select(advert => new GetAllAdvertCompanyResponse
+            {         
                 AdvertName = advert.AdvertName,
                 AdvertDate = advert.AdvertDate,
                 Description = advert.Description,
@@ -100,8 +100,7 @@ namespace Alesta03.Controllers.GeneralController
             _context.Adverts.Add(model);
             await _context.SaveChangesAsync();
 
-            AddAdvertResponse response = new AddAdvertResponse();
-            response.UserId = model.UserId;
+            AddAdvertResponse response = new AddAdvertResponse();           
             response.CompanyName = model.CompanyName;
             response.AdvertName = model.AdvertName;
             response.AdvertDate = model.AdvertDate;

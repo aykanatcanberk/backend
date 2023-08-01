@@ -36,7 +36,6 @@ namespace Alesta03.Controllers.GeneralController
             var userAdverts = _context.Adverts.Where(a => a.UserId == userId).ToList();
 
             var userAdvertApprovals = new List<GetAdvertApprovalResponse>();
-
             foreach (var advert in userAdverts)
             {
                 var advertApprovals = _context.AdvertApprovals
@@ -45,15 +44,13 @@ namespace Alesta03.Controllers.GeneralController
                     {
                         AppName = aa.AppName,
                         AppSurname = aa.AppSurname,
+                        AppSchool=aa.AppSchool,
                         AppAvg = aa.AppAvg, 
                     })
                     .ToList();
-
                 userAdvertApprovals.AddRange(advertApprovals);
             }
-
             return Ok(userAdvertApprovals);
-
         }
 
         [HttpGet("{advertId}"), Authorize(Roles = Role.Admin)]

@@ -2,8 +2,7 @@
 {
     public class GetAllAdvertResponse
     {
-        public int Id { get; set; }
-        public int? UserId { get; set; }
+      
         public string? CompanyName { get; set; }
         public string? AdvertName { get; set; }
         public DateTime? AdvertDate { get; set; }

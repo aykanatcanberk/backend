@@ -48,9 +48,7 @@ namespace Alesta03.Controllers.GeneralController
             if (control is true)
                 return null;
             GetPostResponse response = new GetPostResponse();
-            response.Id = model.Id;
-            response.UserId = (int)model.UserId;
-            response.UserMail = userMail;
+            response.UserMail = model.UserMail;
             response.Content = model.Content;
             response.PostDate = model.PostDate;
             return Ok(response);
@@ -59,8 +57,8 @@ namespace Alesta03.Controllers.GeneralController
         [HttpPost, Authorize]
         public async Task<ActionResult<List<Post>>>AddPost(AddPostRequest request)
         {
-            var userMail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
+            var userName = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == userName);
             var id = user?.ID;
             if (user == null)
                 return NotFound("Kullanıcı Bulunamadı!");
@@ -69,7 +67,7 @@ namespace Alesta03.Controllers.GeneralController
             if (model is not null) return NotFound("Daha Bu Post Atılmış.");
 
                 model.UserId = id;
-                model.UserMail = userMail;
+                model.UserMail = userName;
                 model.Content = request.Content;
                 model.PostDate = DateTime.Now;
 
@@ -77,7 +75,7 @@ namespace Alesta03.Controllers.GeneralController
                 await _context.SaveChangesAsync();
 
                 AddPostResponse response = new AddPostResponse();
-                response.UserMail=userMail;
+                response.UserMail= userName;
                 response.Id=model.Id; 
                 response.UserId = (int)model.UserId;
                 response.Content = model.Content;
@@ -94,9 +92,7 @@ namespace Alesta03.Controllers.GeneralController
 
             var review = await _context.Posts.FindAsync(id);
 
-            if (review is null)
-                return null;
-            if (control is true)
+            if (review ==null||control==true)
                 return null;
 
             model.IsDeleted = review.IsDeleted;
