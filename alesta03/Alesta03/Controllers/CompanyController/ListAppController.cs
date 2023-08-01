@@ -25,22 +25,29 @@ namespace Alesta03.Controllers.CompanyController
 
             var company = _context.Companies.FirstOrDefault(u => u.UsersId == id);
             var cid = company?.ID;
+            var cname = company?.Name;
+            
+
+
+            var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
+            var bwid = appStatus?.BackWorkId;
+            var status = appStatus?.Status;
 
             var app = _context.WorkStatuses
-                .Where(u => u.BackWork.companyID == cid)
-                .Where(x => x.BackWork.Approval.ApprovalStatus == "b")
+                .Where(u => u.BackWorkId == bwid)
+                .Where(x => status == "b")
                 .Select(u => new
                 {
                     name =u.Person.Name,
                     surname=u.Person.Surname,
-                    companyName = u.BackWork.CompanyName,
-                    companyEmail = u.BackWork.CompanyEmail,
+                    companyName = cname,
+                    companyEmail = mail,
                     departmentName = u.BackWork.DepartmentName,
                     employeeId = u.BackWork.EmployeeID,
                     appletter = u.BackWork.AppLetter,
                     startTime = u.BackWork.Start,
                     endTime = u.BackWork.End,
-                    appStatus =u.BackWork.Approval.ApprovalStatus
+                    appStatus =status
                 }).ToList();
 
             return Ok(app);
@@ -48,7 +55,7 @@ namespace Alesta03.Controllers.CompanyController
 
 
         [HttpPut("deneyim onaylama"), Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<Approval>> PozitiveApp()
+        public async Task<ActionResult<ApprovalStatus>> PozitiveApp()
         {
             var mail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);
@@ -57,10 +64,12 @@ namespace Alesta03.Controllers.CompanyController
             var company = _context.Companies.FirstOrDefault(u => u.UsersId == id);
             var cid = company?.ID;
 
-            var approval = _context.Approvals.FirstOrDefault(x => x.BackWork.companyID == cid);
-            if (approval is not null)
-                if (approval.ApprovalStatus is "b")
-                    approval.ApprovalStatus = "o";
+            var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
+            var status = appStatus?.Status;
+
+            if (appStatus is not null)
+                if (status is "b")
+                    status= "o";
 
             await _context.SaveChangesAsync();
 
@@ -69,7 +78,7 @@ namespace Alesta03.Controllers.CompanyController
 
 
         [HttpPut("deneyim reddetme"), Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<Approval>> NegativeApp()
+        public async Task<ActionResult<ApprovalStatus>> NegativeApp()
         {
             var mail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);
@@ -78,10 +87,12 @@ namespace Alesta03.Controllers.CompanyController
             var company = _context.Companies.FirstOrDefault(u => u.UsersId == id);
             var cid = company?.ID;
 
-            var approval = _context.Approvals.FirstOrDefault(x => x.BackWork.companyID == cid);
-            if (approval is not null)
-                if (approval.ApprovalStatus is "b")
-                    approval.ApprovalStatus = "r";
+            var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
+            var status = appStatus?.Status;
+
+            if (appStatus is not null)
+                if (status is "b")
+                    status = "r";
 
             await _context.SaveChangesAsync();
 

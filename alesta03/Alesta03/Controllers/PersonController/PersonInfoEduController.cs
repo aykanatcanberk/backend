@@ -150,31 +150,13 @@ namespace Alesta03.Controllers.PersonController
             return Ok(response);
         }
 
-        [HttpGet, Authorize(Roles = Role.User)]
+        [HttpGet("get all"), Authorize(Roles = Role.User)]
         public async Task<ActionResult<List<BackEdu>>> GetAll()
         {
-            var mail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
-            var id = user?.ID;
 
-            var person = _context.People.FirstOrDefault(u => u.UsersId == id);
-            var pid = person?.ID;
+            var backEdu = await _context.BackEdus.ToListAsync();
 
-
-            var backedu = _context.WorkStatuses
-                .Where(u => u.PersonId == pid)
-                .Select(u => new
-                {
-                    companyName = u.BackWork.CompanyName,
-                    companyEmail = u.BackWork.CompanyEmail,
-                    departmentName = u.BackWork.DepartmentName,
-                    employeeId = u.BackWork.EmployeeID,
-                    appletter = u.BackWork.AppLetter,
-                    startTime = u.BackWork.Start,
-                    endTime = u.BackWork.End
-                }).ToList();
-
-            return Ok(backedu);
+            return Ok(backEdu);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Alesta03.Data
 
         }
 
-        public DbSet<Approval>  Approvals { get; set; }
+        public DbSet<ApprovalStatus>  ApprovalStatuses { get; set; }
         public DbSet<BackEdu> BackEdus { get; set; }
         public DbSet<BackWork> BackWorks { get; set; }
         public DbSet<Company> Companies { get; set; }

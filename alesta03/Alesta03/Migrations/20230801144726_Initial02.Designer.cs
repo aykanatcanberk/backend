@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Alesta03.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230801073548_Initial02")]
+    [Migration("20230801144726_Initial02")]
     partial class Initial02
     {
         /// <inheritdoc />
@@ -102,7 +102,7 @@ namespace Alesta03.Migrations
                     b.ToTable("AdvertApprovals");
                 });
 
-            modelBuilder.Entity("Alesta03.Model.Approval", b =>
+            modelBuilder.Entity("Alesta03.Model.ApprovalStatus", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -110,19 +110,23 @@ namespace Alesta03.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
-                    b.Property<string>("ApprovalStatus")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int?>("BackWorkId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("ID");
 
-                    b.HasIndex("BackWorkId")
-                        .IsUnique();
+                    b.HasIndex("BackWorkId");
 
-                    b.ToTable("Approvals");
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("ApprovalStatuses");
                 });
 
             modelBuilder.Entity("Alesta03.Model.BackEdu", b =>
@@ -168,11 +172,7 @@ namespace Alesta03.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("CompanyEmail")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CompanyName")
+                    b.Property<string>("CompanyMail")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -184,18 +184,13 @@ namespace Alesta03.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("End")
+                    b.Property<DateTime>("End")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("Start")
+                    b.Property<DateTime>("Start")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("companyID")
-                        .HasColumnType("integer");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("companyID");
 
                     b.ToTable("BackWorks");
                 });
@@ -476,22 +471,19 @@ namespace Alesta03.Migrations
                     b.Navigation("person");
                 });
 
-            modelBuilder.Entity("Alesta03.Model.Approval", b =>
+            modelBuilder.Entity("Alesta03.Model.ApprovalStatus", b =>
                 {
                     b.HasOne("Alesta03.Model.BackWork", "BackWork")
-                        .WithOne("Approval")
-                        .HasForeignKey("Alesta03.Model.Approval", "BackWorkId");
+                        .WithMany("ApprovalStatuses")
+                        .HasForeignKey("BackWorkId");
+
+                    b.HasOne("Alesta03.Model.Company", "Company")
+                        .WithMany("ApprovalStatuses")
+                        .HasForeignKey("CompanyId");
 
                     b.Navigation("BackWork");
-                });
 
-            modelBuilder.Entity("Alesta03.Model.BackWork", b =>
-                {
-                    b.HasOne("Alesta03.Model.Company", "company")
-                        .WithMany("backWorks")
-                        .HasForeignKey("companyID");
-
-                    b.Navigation("company");
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("Alesta03.Model.Company", b =>
@@ -578,17 +570,16 @@ namespace Alesta03.Migrations
 
             modelBuilder.Entity("Alesta03.Model.BackWork", b =>
                 {
-                    b.Navigation("Approval")
-                        .IsRequired();
+                    b.Navigation("ApprovalStatuses");
 
                     b.Navigation("WorkStatuses");
                 });
 
             modelBuilder.Entity("Alesta03.Model.Company", b =>
                 {
-                    b.Navigation("Reviews");
+                    b.Navigation("ApprovalStatuses");
 
-                    b.Navigation("backWorks");
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("Alesta03.Model.Person", b =>
