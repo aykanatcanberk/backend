@@ -1,5 +1,6 @@
 ﻿using Alesta03.Request.AddRequest;
 using Alesta03.Request.UpdateRequest;
+using Alesta03.Response.AddResponse;
 using Alesta03.Services.PersonServices.ExpReviewService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,56 +12,82 @@ namespace Alesta03.Controllers.PersonController
     [ApiController]
     public class PersonController : ControllerBase
     {
-        private readonly IExpReviewService _expReviewSercive;
+        private readonly DataContext _context;
 
-        public PersonController(IExpReviewService expReviewService)
+        public PersonController(DataContext context)
         {
-            _expReviewSercive = expReviewService;
+            _context = context;
         }
 
 
-        [HttpGet/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<List<ExpReview>>> GetAllReviews()
+        [HttpPost, Authorize(Roles = Role.User)]
+        public async Task<ActionResult<ExpReview>> AddReview(AddReviewRequest request)
         {
-            return await _expReviewSercive.GetAllReviews();
-        }
+            var userMail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
+            var id = user?.ID;
 
-            [HttpGet("{id}")/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<ExpReview>> GetSingleReviews(int id)
-        {
-            var result = await _expReviewSercive.GetSingleReviews(id);
-            if (result == null)
-                return NotFound("Yorum Bulunumadı!");
+            var person = _context.People.FirstOrDefault(u => u.UsersId == id);
+            var pid = person?.ID;
+            var name = person?.Name;
+            var surname = person?.Surname;
 
-            return Ok(result);
-        }
+            var workStatus = _context.WorkStatuses.FirstOrDefault(x => x.PersonId == pid);
+            var pwid = workStatus?.BackWorkId;
 
-        [HttpPost/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<List<ExpReview>>> AddReview(AddReviewRequest request)
-        {
-            var result = await _expReviewSercive.AddReview(request);
-            return Ok(result);
-        }
-
-        [HttpPut("{id}")/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<List<ExpReview>>> UpdateReview(int id, UpdateReviewRequest request)
-        {
-            var result = await _expReviewSercive.UpdateReview(id, request);
-            if (result == null)
-                return NotFound("Yorum Bulunumadı!");
-
-            return Ok(result);
-        }
-
-        [HttpDelete("{id}")/*, Authorize(Roles = Roles.User)*/]
-        public async Task<ActionResult<List<ExpReview>>> DeleteReview(int id)
-        {
-            var result = await _expReviewSercive.DeleteReview(id);
-            if (result == null)
-                return NotFound("Yorum Bulunumadı!");
+            var backWork = _context.BackWorks.FirstOrDefault(x => x.ID == pwid);
+            var bpwid = backWork?.ID;
+            var cname = backWork?.CompanyName;
+            var cid = backWork?.companyID;
             
-            return Ok(result);
+            var model = _context.Approvals.FirstOrDefault(x => x.BackWorkId == bpwid);
+
+
+            if (model == null) return NotFound("Kullanıcı Bulunamadı");
+            if (model.ApprovalStatus is "b") return BadRequest("Yetkiniz Bulunamamkta");
+            else if (model.ApprovalStatus is "r") return BadRequest("Yetkiniz Bulunamamkta");
+
+
+
+            ExpReview expReview = new ExpReview();
+
+            expReview.PersonId = pid;
+            expReview.Title = request.Title; 
+            expReview.Description = request.Description;
+            expReview.CompanyId = cid;
+            
+
+            _context.ExpReviews.Add(expReview);
+            await _context.SaveChangesAsync();
+
+            AddReviewResponse response = new AddReviewResponse();
+
+
+            response.Title = expReview.Title;
+            response.Description = expReview.Description;
+            response.Date = DateTime.Now;
+            response.Name = name;
+            response.Surname = surname;
+            response.CName = cname;
+            return Ok(response);
         }
+
+        //[HttpGet, Authorize(Roles = Role.User)]
+        //public async Task<ActionResult<List<ExpReview>>> GetAllReviews()
+        //{
+        //}
+
+        //[HttpGet, Authorize(Roles = Role.User)]
+        //public async Task<ActionResult<ExpReview>> GetSingleReviews(int id)
+        //{
+        //}
+
+        //[HttpPut, Authorize(Roles = Role.User)]
+        //public async Task<ActionResult<List<ExpReview>>> UpdateReview(int id, UpdateReviewRequest request)
+        //{
+        //}
+
+
 
     }
 }

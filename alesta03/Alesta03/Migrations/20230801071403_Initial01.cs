@@ -7,11 +7,28 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Alesta03.Migrations
 {
     /// <inheritdoc />
-    public partial class Inital01 : Migration
+    public partial class Initial01 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "BackEdus",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SchoolName = table.Column<string>(type: "text", nullable: false),
+                    DepartmentName = table.Column<string>(type: "text", nullable: false),
+                    SchoolType = table.Column<string>(type: "text", nullable: false),
+                    EduStatus = table.Column<bool>(type: "boolean", nullable: false),
+                    Avg = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BackEdus", x => x.ID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "BackWorks",
                 columns: table => new
@@ -19,10 +36,12 @@ namespace Alesta03.Migrations
                     ID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CompanyName = table.Column<string>(type: "text", nullable: false),
+                    CompanyEmail = table.Column<string>(type: "text", nullable: false),
                     DepartmentName = table.Column<string>(type: "text", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    EmployeeID = table.Column<string>(type: "text", nullable: false),
+                    AppLetter = table.Column<string>(type: "text", nullable: false),
+                    Start = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    End = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,26 +61,6 @@ namespace Alesta03.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Approvals",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ApprovalStatus = table.Column<string>(type: "text", nullable: false),
-                    BackWorkId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Approvals", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Approvals_BackWorks_BackWorkId",
-                        column: x => x.BackWorkId,
-                        principalTable: "BackWorks",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -70,15 +69,56 @@ namespace Alesta03.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
                     UserType = table.Column<string>(type: "text", nullable: false),
-                    RolesId = table.Column<int>(type: "integer", nullable: true)
+                    IsFirstLogin = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Approvals",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ApprovalStatus = table.Column<string>(type: "text", nullable: false),
+                    BackWorkId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Approvals", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Users_Roles_RolesId",
-                        column: x => x.RolesId,
-                        principalTable: "Roles",
+                        name: "FK_Approvals_BackWorks_BackWorkId",
+                        column: x => x.BackWorkId,
+                        principalTable: "BackWorks",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Adverts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: true),
+                    CompanyName = table.Column<string>(type: "text", nullable: true),
+                    AdvertName = table.Column<string>(type: "text", nullable: true),
+                    AdvertDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    AdvertType = table.Column<string>(type: "text", nullable: true),
+                    Department = table.Column<string>(type: "text", nullable: true),
+                    WorkType = table.Column<string>(type: "text", nullable: true),
+                    WorkPreference = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Adverts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Adverts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "ID");
                 });
 
@@ -98,8 +138,8 @@ namespace Alesta03.Migrations
                     Prof = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
                     Website = table.Column<string>(type: "text", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UsersId = table.Column<int>(type: "integer", nullable: false)
+                    Image = table.Column<string>(type: "text", nullable: true),
+                    UsersId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -108,8 +148,7 @@ namespace Alesta03.Migrations
                         name: "FK_Companies_Users_UsersId",
                         column: x => x.UsersId,
                         principalTable: "Users",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -123,8 +162,8 @@ namespace Alesta03.Migrations
                     Birthday = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UsersId = table.Column<int>(type: "integer", nullable: false)
+                    Image = table.Column<string>(type: "text", nullable: true),
+                    UsersId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -133,86 +172,53 @@ namespace Alesta03.Migrations
                         name: "FK_People_Users_UsersId",
                         column: x => x.UsersId,
                         principalTable: "Users",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
-                name: "BackEdus",
+                name: "Posts",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SchoolName = table.Column<string>(type: "text", nullable: false),
-                    DepartmentName = table.Column<string>(type: "text", nullable: false),
-                    SchoolType = table.Column<string>(type: "text", nullable: false),
-                    EduStatus = table.Column<bool>(type: "boolean", nullable: false),
-                    Avg = table.Column<float>(type: "real", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CompanyId = table.Column<int>(type: "integer", nullable: false)
+                    UserId = table.Column<int>(type: "integer", nullable: true),
+                    PostDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BackEdus", x => x.ID);
+                    table.PrimaryKey("PK_Posts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BackEdus_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Posts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExpReviews",
+                name: "AdvertApprovals",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    PersonId = table.Column<int>(type: "integer", nullable: false),
-                    CompanyId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExpReviews", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_ExpReviews_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ExpReviews_People_PersonId",
-                        column: x => x.PersonId,
-                        principalTable: "People",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkStatuses",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PersonId = table.Column<int>(type: "integer", nullable: false),
-                    BackWorkId = table.Column<int>(type: "integer", nullable: false)
+                    AdvertId = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: true),
+                    ApproveDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkStatuses", x => x.ID);
+                    table.PrimaryKey("PK_AdvertApprovals", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkStatuses_BackWorks_BackWorkId",
-                        column: x => x.BackWorkId,
-                        principalTable: "BackWorks",
-                        principalColumn: "ID",
+                        name: "FK_AdvertApprovals_Adverts_AdvertId",
+                        column: x => x.AdvertId,
+                        principalTable: "Adverts",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WorkStatuses_People_PersonId",
+                        name: "FK_AdvertApprovals_People_PersonId",
                         column: x => x.PersonId,
                         principalTable: "People",
                         principalColumn: "ID",
@@ -225,8 +231,8 @@ namespace Alesta03.Migrations
                 {
                     ID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PersonId = table.Column<int>(type: "integer", nullable: false),
-                    BackEduId = table.Column<int>(type: "integer", nullable: false)
+                    PersonId = table.Column<int>(type: "integer", nullable: true),
+                    BackEduId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -235,26 +241,85 @@ namespace Alesta03.Migrations
                         name: "FK_EduStatuses_BackEdus_BackEduId",
                         column: x => x.BackEduId,
                         principalTable: "BackEdus",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID");
                     table.ForeignKey(
                         name: "FK_EduStatuses_People_PersonId",
                         column: x => x.PersonId,
                         principalTable: "People",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "ExpReviews",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    PersonId = table.Column<int>(type: "integer", nullable: true),
+                    CompanyId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpReviews", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_ExpReviews_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_ExpReviews_People_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "People",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkStatuses",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PersonId = table.Column<int>(type: "integer", nullable: true),
+                    BackWorkId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkStatuses", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_WorkStatuses_BackWorks_BackWorkId",
+                        column: x => x.BackWorkId,
+                        principalTable: "BackWorks",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_WorkStatuses_People_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "People",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdvertApprovals_AdvertId",
+                table: "AdvertApprovals",
+                column: "AdvertId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdvertApprovals_PersonId",
+                table: "AdvertApprovals",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Adverts_UserId",
+                table: "Adverts",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Approvals_BackWorkId",
                 table: "Approvals",
                 column: "BackWorkId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BackEdus_CompanyId",
-                table: "BackEdus",
-                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Companies_UsersId",
@@ -287,9 +352,9 @@ namespace Alesta03.Migrations
                 column: "UsersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_RolesId",
-                table: "Users",
-                column: "RolesId");
+                name: "IX_Posts_UserId",
+                table: "Posts",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkStatuses_BackWorkId",
@@ -306,6 +371,9 @@ namespace Alesta03.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AdvertApprovals");
+
+            migrationBuilder.DropTable(
                 name: "Approvals");
 
             migrationBuilder.DropTable(
@@ -315,10 +383,22 @@ namespace Alesta03.Migrations
                 name: "ExpReviews");
 
             migrationBuilder.DropTable(
+                name: "Posts");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
+
+            migrationBuilder.DropTable(
                 name: "WorkStatuses");
 
             migrationBuilder.DropTable(
+                name: "Adverts");
+
+            migrationBuilder.DropTable(
                 name: "BackEdus");
+
+            migrationBuilder.DropTable(
+                name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "BackWorks");
@@ -327,13 +407,7 @@ namespace Alesta03.Migrations
                 name: "People");
 
             migrationBuilder.DropTable(
-                name: "Companies");
-
-            migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Roles");
         }
     }
 }
