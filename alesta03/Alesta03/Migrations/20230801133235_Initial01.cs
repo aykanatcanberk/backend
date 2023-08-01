@@ -35,13 +35,11 @@ namespace Alesta03.Migrations
                 {
                     ID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CompanyName = table.Column<string>(type: "text", nullable: false),
-                    CompanyEmail = table.Column<string>(type: "text", nullable: false),
                     DepartmentName = table.Column<string>(type: "text", nullable: false),
                     EmployeeID = table.Column<string>(type: "text", nullable: false),
                     AppLetter = table.Column<string>(type: "text", nullable: false),
-                    Start = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    End = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    Start = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    End = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,25 +72,6 @@ namespace Alesta03.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Approvals",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ApprovalStatus = table.Column<string>(type: "text", nullable: false),
-                    BackWorkId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Approvals", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Approvals_BackWorks_BackWorkId",
-                        column: x => x.BackWorkId,
-                        principalTable: "BackWorks",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -193,6 +172,31 @@ namespace Alesta03.Migrations
                         name: "FK_Posts_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Approvals",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    BackWorkId = table.Column<int>(type: "integer", nullable: true),
+                    CompanyId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Approvals", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Approvals_BackWorks_BackWorkId",
+                        column: x => x.BackWorkId,
+                        principalTable: "BackWorks",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_Approvals_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
                         principalColumn: "ID");
                 });
 
@@ -320,6 +324,11 @@ namespace Alesta03.Migrations
                 table: "Approvals",
                 column: "BackWorkId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Approvals_CompanyId",
+                table: "Approvals",
+                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Companies_UsersId",

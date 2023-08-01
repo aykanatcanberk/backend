@@ -4,8 +4,7 @@ namespace Alesta03.Response.GetResponse
 {
     public class GetBackWorkResponse
     {
-        public string CompanyName { get; set; }
-        public string CompanyEmail { get; set; }
+        public string CompanyMail { get; set; }
         public string DepartmentName { get; set; }
         public string EmployeeID { get; set; }
         public string AppLetter { get; set; }

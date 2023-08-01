@@ -25,6 +25,6 @@ namespace Alesta03.Model
 
         public List<ExpReview> Reviews { get; set; }
 
-        public List<BackWork> backWorks { get; set; }
+        public List<ApprovalStatus> ApprovalStatuses { get; set; }
     }
 }

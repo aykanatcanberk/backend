@@ -110,15 +110,5 @@ namespace Alesta03.Controllers.GeneralController
             
             return jwt;
         }
-
-
-        //[HttpGet, Authorize]
-        //public ActionResult<string> GetMyMail()
-        //{
-        //    var userMail = User?.Identity?.Name;
-        //    var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
-        //    var id = user.ID;
-        //    return Ok(id);
-        //}
     }
 }

@@ -29,40 +29,38 @@ namespace Alesta03.Controllers.PersonController
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);
             var id = user?.ID;
 
-            if (user == null)
-                return NotFound("Kullanıcı Bulunumadı!");
+            if (user == null) return NotFound("Kullanıcı Bulunumadı!");
 
             var person = _context.People.FirstOrDefault(u => u.UsersId == id);
             var pid = person?.ID;
 
-            if (person == null)
-                return NotFound("Kişi Bulunumadı!");
-
+            if (person == null) return NotFound("Kişi Bulunumadı!");
+              
             var model = _context.WorkStatuses.FirstOrDefault(x =>x.PersonId == pid);
-            if (model == null)
-                return NotFound("Kişi İş Bilgisi Bulunamadı!");
 
+            if (model == null) return NotFound("Kişi İş Bilgisi Bulunamadı!");
+                
             var pwid = model.BackWorkId;
-            
             var backWork = _context.BackWorks.FirstOrDefault(x => x.ID == pwid);
-            if (backWork == null)
-                return NotFound("Kişi İş Geçmişi Bulunamadı!");
+
+            if (backWork == null) return NotFound("Kişi İş Geçmişi Bulunamadı!");
 
             var bpwid = backWork.ID;
-            var app = _context.Approvals.FirstOrDefault(x => x.BackWorkId == bpwid);
+            var app = _context.ApprovalStatuses.FirstOrDefault(x => x.BackWorkId == bpwid);
+            var appStatus = app?.Status;
+            var appCIP = app?.CompanyId;
 
-            var appStatus = app?.ApprovalStatus;
+            var company = _context.Companies.FirstOrDefault(x => x.ID == appCIP);
 
             GetBackWorkResponse response = new GetBackWorkResponse();
 
-            response.CompanyName = backWork.CompanyName;
+            response.CompanyMail = company.Users.Email;
             response.DepartmentName = backWork.DepartmentName;
             response.EmployeeID = backWork.EmployeeID;
             response.AppLetter = backWork.AppLetter;
             response.Start = backWork.Start;
             response.End = backWork.End;
             response.appStatus = appStatus;
-            response.CompanyEmail = backWork.CompanyEmail;
 
             return Ok(response);
         }
@@ -74,42 +72,43 @@ namespace Alesta03.Controllers.PersonController
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);
             var id = user?.ID;
 
-            if (user == null)
-                return NotFound("Kişi Bulunumadı!");
+            if (user == null) return NotFound("Kişi Bulunumadı!");
 
             var person = _context.People.FirstOrDefault(u => u.UsersId == id);
             var pid = person?.ID;
 
-            if (person == null)
-                return NotFound("Kişi Bulunumadı!");
+            if (person == null) return NotFound("Kişi Bulunumadı!");
 
             var model = _context.WorkStatuses.FirstOrDefault(x => x.PersonId == pid);
-            if (model == null)
-                return NotFound("Kişi İş Bilgisi Bulunamadı!");
+            if (model == null) return NotFound("Kişi İş Bilgisi Bulunamadı!");
 
             var pwid = model.BackWorkId;
 
             var backWork = _context.BackWorks.FirstOrDefault(x => x.ID == pwid);
-            if (backWork == null)
-                return NotFound("Kişi İş Geçmişi Bulunamadı!");
+            if (backWork == null) return NotFound("Kişi İş Geçmişi Bulunamadı!");
 
-            backWork.CompanyName = request.CompanyName;
+            var bpwid = backWork.ID;
+            var app = _context.ApprovalStatuses.FirstOrDefault(x => x.BackWorkId == bpwid);
+            var appStatus = app?.Status;
+            var appCIP = app?.CompanyId;
+
+            var company = _context.Companies.FirstOrDefault(x => x.ID == appCIP);
+
+            company.Users.Email= request.CompanyMail;
             backWork.DepartmentName = request.DepartmentName;
             backWork.EmployeeID = request.EmployeeID;
             backWork.AppLetter = request.AppLetter;
             backWork.Start = request.Start; 
             backWork.End = request.End;
-            backWork.CompanyEmail = request.CompanyEmail;
 
             UpdateInfoWorkResponse response = new UpdateInfoWorkResponse
             {
-                CompanyName = backWork.CompanyName,
+                CompanyName = company.Name,
                 DepartmentName = backWork.DepartmentName,
                 EmployeeID = backWork.EmployeeID,
                 AppLetter = backWork.AppLetter,
                 Start = backWork.Start,
-                End = backWork.End,
-                CompanyEmail = backWork.CompanyEmail
+                End = backWork.End
             };
 
             await _context.SaveChangesAsync();
@@ -129,26 +128,25 @@ namespace Alesta03.Controllers.PersonController
 
             BackWork model = new BackWork();
 
-            model.CompanyName = request.CompanyName;
+
+            model.CompanyMail = request.CompanyEmail;
             model.DepartmentName = request.DepartmentName;
             model.EmployeeID = request.EmployeeID;
             model.AppLetter = request.AppLetter;
             model.Start = request.Start;
             model.End = request.End;
-            model.CompanyEmail = request.CompanyEmail;
             
             _context.BackWorks.Add(model);
             await _context.SaveChangesAsync();
 
             AddInfoWorkResponse response = new AddInfoWorkResponse();
 
-            response.CompanyName = model.CompanyName;
+            response.CompanyEmail = model.CompanyMail;
             response.DepartmentName = model.DepartmentName;
             response.EmployeeID = model.EmployeeID;
             response.AppLetter = model.AppLetter;
             response.Start = model.Start;
             response.End = model.End;
-            response.CompanyEmail = model.CompanyEmail;
 
 
             WorkStatus workStatus = new WorkStatus();
@@ -162,20 +160,32 @@ namespace Alesta03.Controllers.PersonController
             _context.WorkStatuses.Add(workStatus);
             await _context.SaveChangesAsync();
 
-            Approval approval = new Approval();
+            ApprovalStatus approval = new ApprovalStatus();
 
             var workSta = _context.WorkStatuses.FirstOrDefault(x => x.PersonId == pid);
             var pwid = workSta?.BackWorkId;
             var backWork = _context.BackWorks.FirstOrDefault(x => x.ID == pwid);
             var bpwid = backWork?.ID;
 
-            approval.ApprovalStatus = string.Empty;
-            approval.BackWorkId = bpwid;
+            var k = _context.Companies.FirstOrDefault(x => x.Users.Email == model.CompanyMail);
+            var copmanyid = k?.ID;
 
-            _context.Approvals.Add(approval);
+            approval.Status = string.Empty;
+            approval.BackWorkId = bpwid;
+            approval.CompanyId = copmanyid;
+
+            _context.ApprovalStatuses.Add(approval);
             await _context.SaveChangesAsync();
             
             return Ok(response);
+        }
+
+        [HttpGet("get all"), Authorize(Roles = Role.User)]
+        public async Task<ActionResult<List<BackWork>>> GetAll()
+        {
+            var backEdu = await _context.BackWorks.ToListAsync();
+
+            return Ok(backEdu);
         }
     }
 }
