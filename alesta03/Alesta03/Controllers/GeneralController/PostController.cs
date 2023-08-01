@@ -23,18 +23,16 @@ namespace Alesta03.Controllers.GeneralController
             _context = context;
         }
 
-
         [HttpGet ,Authorize]
         public async Task<ActionResult<Post>> GetAllPosts()
         {
-
+            var userMail = User?.Identity?.Name;
             var posts = await _context.Posts.Where(post => !post.IsDeleted).ToListAsync();
             var responseList = posts.Select(post => new GetAllPostResponse
             {
-                Id = post.Id,
-                UserId = (int)post.UserId,
                 Content = post.Content,
-                PostDate = post.PostDate
+                PostDate = post.PostDate,
+                UserMail=post.UserMail
             }).ToList();
             return Ok(responseList);
         }
@@ -42,6 +40,7 @@ namespace Alesta03.Controllers.GeneralController
         [HttpGet("{id}") ,Authorize]
         public async Task<ActionResult<Post>> GetSinglePost(int id)
         {
+            var userMail = User?.Identity?.Name;
             var model = await _context.Posts.FindAsync(id);
             var control = model.IsDeleted;
             if (model is null)
@@ -51,14 +50,14 @@ namespace Alesta03.Controllers.GeneralController
             GetPostResponse response = new GetPostResponse();
             response.Id = model.Id;
             response.UserId = (int)model.UserId;
+            response.UserMail = userMail;
             response.Content = model.Content;
             response.PostDate = model.PostDate;
             return Ok(response);
-
         }
 
         [HttpPost, Authorize]
-        public async Task<ActionResult<List<Post>>> AddPost(AddPostRequest request)
+        public async Task<ActionResult<List<Post>>>AddPost(AddPostRequest request)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
@@ -70,9 +69,9 @@ namespace Alesta03.Controllers.GeneralController
             if (model is not null) return NotFound("Daha Bu Post Atılmış.");
 
                 model.UserId = id;
+                model.UserMail = userMail;
                 model.Content = request.Content;
                 model.PostDate = DateTime.Now;
-
 
                 _context.Posts.Add(model);
                 await _context.SaveChangesAsync();

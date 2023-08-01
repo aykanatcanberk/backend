@@ -11,7 +11,7 @@ namespace Alesta03.Model
         public int Id { get; set; }
 
         public int ?UserId { get; set; }
-
+        public string ?UserMail { get; set; }
         public DateTime PostDate { get; set; }
         public string? Content { get; set; }
         public bool IsDeleted { get; set; }

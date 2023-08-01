@@ -126,7 +126,6 @@ namespace Alesta03.Controllers.CompanyController
             await _context.SaveChangesAsync();
 
             AddCProfileResponse response = new AddCProfileResponse();
-
             response.Category = model.Category;
             response.Type = model.Type;
             response.Name = model.Name;
@@ -140,6 +139,7 @@ namespace Alesta03.Controllers.CompanyController
             response.UsersId = model.UsersId;
 
             return Ok(response);
+
         }
     }
 }

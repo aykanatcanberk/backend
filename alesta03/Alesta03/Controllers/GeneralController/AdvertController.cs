@@ -20,23 +20,35 @@ namespace Alesta03.Controllers.GeneralController
         {
             _context = context;
         }
+        [Route("api/[controller]/person")]
 
-        [HttpGet]
-        public async Task<ActionResult<Advert>> GetAllAdvert()
+        [HttpGet,Authorize]
+        public async Task<ActionResult<Advert>> GetAllAdvertPerson()
         {
             var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
             var responseList = adverts.Select(advert => new GetAllAdvertResponse
             {
-                Id = advert.Id,
-                UserId = advert.UserId,
                 CompanyName = advert.CompanyName,
                 AdvertName = advert.AdvertName,
                 AdvertDate = advert.AdvertDate,
                 Description = advert.Description,
                 AdvertType = advert.AdvertType,
-                Department = advert.Department,
-                WorkType = advert.WorkType,
-                WorkPreference = advert.WorkPreference
+            }).ToList();
+            return Ok(responseList);
+
+        }
+
+        [Route("api/[controller]/company")]
+        [HttpGet, Authorize]
+        public async Task<ActionResult<Advert>> GetAllAdvertCompany()
+        {
+            var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
+            var responseList = adverts.Select(advert => new GetAllAdvertResponse
+            {
+                AdvertName = advert.AdvertName,
+                AdvertDate = advert.AdvertDate,
+                Description = advert.Description,
+                AdvertType = advert.AdvertType,
             }).ToList();
             return Ok(responseList);
 
@@ -47,15 +59,12 @@ namespace Alesta03.Controllers.GeneralController
         {
             var model = await _context.Adverts.FindAsync(id);
             var control = model.IsDeleted;
-
             if (model is null)
                 return null;
             if (control is true)
                 return null;
             GetAdvertResponse response = new GetAdvertResponse();
-            response.Id = model.Id;
-            response.UserId = model.UserId;
-            response.CompanyName = model.CompanyName;
+
             response.AdvertName = model.AdvertName;
             response.AdvertDate = model.AdvertDate;
             response.Description = model.Description;
@@ -73,13 +82,13 @@ namespace Alesta03.Controllers.GeneralController
             var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
             var id = user?.ID;
             if (user == null)
-                return NotFound("Kullanıcı Bulunumadı!");
+                return NotFound("Kullanıcı Bulunamadı!");
 
             var model = _context.Adverts.FirstOrDefault(x => x.UserId == id);
-            if (model is not null) return NotFound("Daha Bu Post Atılmış.");
+            if (model is not null) return NotFound("Daha Bu İlan Atılmış.");
 
             model.UserId = id;
-            model.CompanyName = request.CompanyName;
+            model.CompanyName = userMail;
             model.AdvertName = request.AdvertName;
             model.AdvertDate = DateTime.Now;
             model.Description = request.Description;
@@ -101,12 +110,10 @@ namespace Alesta03.Controllers.GeneralController
             response.Department = model.Department;
             response.WorkType = model.WorkType;
             response.WorkPreference = model.WorkPreference;
-
             return Ok(response);
         }
 
-
-        [HttpDelete("{id}")/*, Authorize(Roles = Role.Admin)*/]
+        [HttpDelete("{id}"), Authorize(Roles = Role.Admin)]
         public async Task<ActionResult<List<Advert>>> DeleteAdvert(int id)
         {
             Advert model = new Advert();
