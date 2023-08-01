@@ -10,12 +10,6 @@ namespace Alesta03.Services.PersonServices.ExpReviewService
 {
     public interface IExpReviewService
     {
-        //GetReviewResponse GetAllReviews();
-        Task<List<ExpReview>> GetAllReviews();
-        Task<GetReviewResponse?> GetSingleReviews(int id);
-        Task<AddReviewResponse> AddReview(AddReviewRequest request);
-        Task<UpdateReviewResponse?> UpdateReview(int id, UpdateReviewRequest request);
-        Task<DeleteReviewResponse?> DeleteReview(int id);
     }
 }
 

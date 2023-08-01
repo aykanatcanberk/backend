@@ -1,10 +1,10 @@
-﻿namespace Alesta03.Response.UpdateResponse
+﻿namespace Alesta03.Request.AddRequest
 {
-    public class UpdateInfoWorkResponse
+    public class AddInfoWorkRequest
     {
-        public string CompanyName { get; set; }
+        public string CompanyName { get; set; } = string.Empty;
         public string CompanyEmail { get; set; }
-        public string DepartmentName { get; set; }
+        public string DepartmentName { get; set; } = string.Empty;
         public string EmployeeID { get; set; }
         public string AppLetter { get; set; }
         public DateTimeOffset Start { get; set; }

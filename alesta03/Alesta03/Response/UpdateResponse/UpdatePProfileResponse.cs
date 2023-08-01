@@ -7,7 +7,6 @@
         public DateTime Birthday { get; set; }
         public string Phone { get; set; }
         public string Location { get; set; }
-        public DateTime UpdateDate { get; set; } = DateTime.Now;
         
     }
 }

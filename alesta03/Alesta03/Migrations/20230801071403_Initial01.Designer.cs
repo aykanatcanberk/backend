@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Alesta03.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230731035322_Initial06")]
-    partial class Initial06
+    [Migration("20230801071403_Initial01")]
+    partial class Initial01
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -136,9 +136,6 @@ namespace Alesta03.Migrations
                     b.Property<float>("Avg")
                         .HasColumnType("real");
 
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -154,12 +151,7 @@ namespace Alesta03.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.HasKey("ID");
-
-                    b.HasIndex("CompanyId");
 
                     b.ToTable("BackEdus");
                 });
@@ -176,6 +168,10 @@ namespace Alesta03.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("CompanyEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -184,16 +180,14 @@ namespace Alesta03.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("EmployeeID")
-                        .HasColumnType("integer");
+                    b.Property<string>("EmployeeID")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("EndTime")
+                    b.Property<DateTimeOffset>("End")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTimeOffset>("Start")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ID");
@@ -246,9 +240,6 @@ namespace Alesta03.Migrations
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UsersId")
                         .HasColumnType("integer");
@@ -305,18 +296,12 @@ namespace Alesta03.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
                     b.Property<int?>("PersonId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ID");
 
@@ -356,9 +341,6 @@ namespace Alesta03.Migrations
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UsersId")
                         .HasColumnType("integer");
@@ -498,15 +480,6 @@ namespace Alesta03.Migrations
                     b.Navigation("BackWork");
                 });
 
-            modelBuilder.Entity("Alesta03.Model.BackEdu", b =>
-                {
-                    b.HasOne("Alesta03.Model.Company", "Company")
-                        .WithMany("BackEdus")
-                        .HasForeignKey("CompanyId");
-
-                    b.Navigation("Company");
-                });
-
             modelBuilder.Entity("Alesta03.Model.Company", b =>
                 {
                     b.HasOne("Alesta03.Model.User", "Users")
@@ -599,8 +572,6 @@ namespace Alesta03.Migrations
 
             modelBuilder.Entity("Alesta03.Model.Company", b =>
                 {
-                    b.Navigation("BackEdus");
-
                     b.Navigation("Reviews");
                 });
 

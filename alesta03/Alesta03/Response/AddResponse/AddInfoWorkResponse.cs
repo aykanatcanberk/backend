@@ -1,9 +1,9 @@
-﻿namespace Alesta03.Response.UpdateResponse
+﻿namespace Alesta03.Response.AddResponse
 {
-    public class UpdateInfoWorkResponse
+    public class AddInfoWorkResponse
     {
-        public string CompanyName { get; set; }
         public string CompanyEmail { get; set; }
+        public string CompanyName { get; set; }
         public string DepartmentName { get; set; }
         public string EmployeeID { get; set; }
         public string AppLetter { get; set; }
