@@ -8,7 +8,7 @@ namespace Alesta03.Services.GeneralService
     {
         Task<ActionResult<User>> RegisterCompany(RegisterRequestUC request);
         Task<ActionResult<User>> RegisterPerson(RegisterRequestUP request);
-        Task<ActionResult<User>> LoginPerson(UserDto request);
-        Task<ActionResult<User>> LoginCompany(UserDto request);
+        Task<ActionResult<string>> LoginPerson(UserDto request);
+        Task<ActionResult<string>> LoginCompany(UserDto request);
     }
 }
