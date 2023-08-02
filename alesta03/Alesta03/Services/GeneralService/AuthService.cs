@@ -1,10 +1,12 @@
 ﻿using Alesta03.Model;
 using Alesta03.Request.DtoRequest;
 using Alesta03.Request.RgeisterRequest;
+using Alesta03.Response;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
@@ -76,8 +78,7 @@ namespace Alesta03.Services.GeneralService
         public async Task<ActionResult<string>> Login(UserDto request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            
-
+           
             if (user.Email != request.Email) 
                 return null;
             else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash)) 
@@ -85,14 +86,17 @@ namespace Alesta03.Services.GeneralService
             else if (user.UserType != user.UserType) 
                 return null;
             
-            if(user.IsFirstLogin is true)
-                user.IsFirstLogin = false;
-
-
             string token = CreateToken(user);
             await _context.SaveChangesAsync();
 
-            return token;
+            LoginResult loginResult = new LoginResult
+            {
+                token = token,
+                control = user.IsFirstLogin
+            };
+
+            string json = JsonConvert.SerializeObject(loginResult); 
+            return json;
         }
 
 

@@ -77,13 +77,12 @@ namespace Alesta03.Controllers.GeneralController
                 return BadRequest("Kullanıcı Türünüz Yanlış!");
             }
 
-            if(user.Result.IsFirstLogin is true)
-                user.Result.IsFirstLogin = false;
-                _context.SaveChanges();
+            
 
             string token = CreateToken(user.Result);
+            bool control = user.Result.IsFirstLogin;
 
-            return Ok(token);
+            return Ok(new { token, control });
         }
 
         private string CreateToken(User user)

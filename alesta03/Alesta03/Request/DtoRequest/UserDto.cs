@@ -9,6 +9,7 @@ namespace Alesta03.Request.DtoRequest
 
         [Required, MinLength(6, ErrorMessage = "Lütfen en az altı karakterli bir şifre oluşturunuz!")]
         public required string Password { get; set; } = string.Empty;
+
  
     }
 }
