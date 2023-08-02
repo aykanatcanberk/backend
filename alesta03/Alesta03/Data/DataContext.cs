@@ -14,7 +14,7 @@ namespace Alesta03.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=vizyonergenc03;Username=postgres;Password=354354");
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=vizyonergenc03;Username=postgres;Password=1234");
 
         }
 

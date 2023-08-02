@@ -25,7 +25,7 @@ namespace Alesta03.Controllers.GeneralController
             _context = context;
         }
 
-        [HttpGet("AllPosts"),Authorize]
+        [HttpGet("AllPosts"), Authorize]
         public async Task<ActionResult<Post>> GetAllPosts()
         {
             var mail = User?.Identity?.Name;
@@ -34,13 +34,27 @@ namespace Alesta03.Controllers.GeneralController
             if (user == null)
                 return NotFound("Gönderi Bulunamadı!");
 
-            var posts = await _context.Posts.Where(post => !post.IsDeleted).ToListAsync();
-            var responseList = posts.Select(post => new GetAllPostResponse
-            {   
-                Name = _context.People.FirstOrDefault(x => x.UsersId == id).Name,
-                Content = post.Content,
-                PostDate = post.PostDate,
-            }).ToList();
+            var Posts = await _context.Posts.ToListAsync();
+            var responseList = new List<GetPostResponse>();
+
+            foreach (var post in Posts)
+            {
+                var postid = post.UserId;
+                var person = _context.People.FirstOrDefault(y => y.UsersId == postid);
+                var name = person.Name;
+
+                var _post = await _context.Posts
+                    .Where(aa => aa.UserId == postid)
+                    .Select(aa => new GetPostResponse
+                    {
+                        Name = name,
+                        Content = aa.Content,
+                        PostDate = aa.PostDate,
+                    }).ToListAsync();
+
+                responseList.AddRange(_post);
+            }
+
             return Ok(responseList);
         }
 
@@ -54,13 +68,17 @@ namespace Alesta03.Controllers.GeneralController
                 return NotFound("Gönderi Bulunamadı!");
 
             var model = _context.Posts.FirstOrDefault(x => x.UserId == id);
-            if (model == null) 
+            if (model == null)
                 return NotFound("Gönderi Bilgisi Bulunamadı!");
-           var name= _context.People.FirstOrDefault(x => x.UsersId == id).Name;
+            var person = _context.People.FirstOrDefault(y => y.UsersId == id);
+
+            var name = person.Name;
+
             var _post = await _context.Posts
                 .Where(aa => aa.UserId == id)
-                .Select(aa => new GetPostRequest
-                {   Name=name,
+                .Select(aa => new GetPostResponse
+                {
+                    Name = name,
                     Content = aa.Content,
                     PostDate = aa.PostDate,
                 }).ToListAsync();
@@ -68,39 +86,39 @@ namespace Alesta03.Controllers.GeneralController
         }
 
         [HttpPost, Authorize]
-        public async Task<ActionResult<List<Post>>>AddPost(AddPostRequest request)
+        public async Task<ActionResult<List<Post>>> AddPost(AddPostRequest request)
         {
-            var userName = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == userName);
+            var userMail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
             var id = user?.ID;
             if (user == null)
                 return NotFound("Kullanıcı Bulunamadı!");
+            var newPost = new Post
+            {
+                UserId = id,
+                Content = request.Content,
+                PostDate = DateTime.Now
+            };
 
-            var model = _context.Posts.FirstOrDefault(x => x.UserId == id);
-            if (model is not null) return NotFound("Daha Bu Post Atılmış.");
-
-                model.UserId = id;
-                model.Content = request.Content;
-                model.PostDate = DateTime.Now;
-
-                _context.Posts.Add(model);
-                await _context.SaveChangesAsync();
+            _context.Posts.Add(newPost);
+            await _context.SaveChangesAsync();
 
 
-            var name = _context.People.FirstOrDefault(x => x.UsersId == id).Name;
 
             AddPostResponse response = new AddPostResponse();
-                response.UserName= name;
-                response.PostDate = model.PostDate;
-                response.Content = model.Content;
+            response.Id = newPost.Id;
+            response.UserId = newPost.UserId;
+            response.PostDate = newPost.PostDate;
+            response.Content = newPost.Content;
 
-                return Ok(response);
+            return Ok(response);
         }
+
 
         [HttpDelete, Authorize]
         public async Task<ActionResult<List<Post>>> DeletePost()
         {
-            
+
             var userName = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == userName);
             var userId = user?.ID;
@@ -110,7 +128,7 @@ namespace Alesta03.Controllers.GeneralController
                 return Unauthorized();
             }
             var post = await _context.Posts.FirstOrDefaultAsync(p => p.UserId == userId && !p.IsDeleted);
-           
+
             if (post == null)
             {
                 return NotFound("Gönderi Bulunamadı.");
@@ -123,4 +141,3 @@ namespace Alesta03.Controllers.GeneralController
         }
     }
 }
-    
