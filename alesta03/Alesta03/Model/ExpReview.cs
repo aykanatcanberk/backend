@@ -14,6 +14,10 @@ namespace Alesta03.Model
         public DateTime Date { get; set; }
         public string Description { get; set; }
 
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public string CompanyName { get; set; }
+
         public Person Person { get; set; }
         public int ?PersonId { get; set; }
 

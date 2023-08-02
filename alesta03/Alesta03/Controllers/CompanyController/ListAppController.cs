@@ -25,9 +25,7 @@ namespace Alesta03.Controllers.CompanyController
 
             var company = _context.Companies.FirstOrDefault(u => u.UsersId == id);
             var cid = company?.ID;
-            var cname = company?.Name;
-            
-
+            var cname = company?.Name;           
 
             var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
             var bwid = appStatus?.BackWorkId;
@@ -54,17 +52,13 @@ namespace Alesta03.Controllers.CompanyController
         }
 
 
-        [HttpPut("deneyim onaylama"), Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<ApprovalStatus>> PozitiveApp()
+        [HttpPut("deneyim onaylama,{deneyimId}"), Authorize(Roles = Role.Admin)]
+        public async Task<ActionResult<ApprovalStatus>> PozitiveApp(int reviewId)
         {
-            var mail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
-            var id = user?.ID;
+            var expReview = _context.ExpReviews.FirstOrDefault(x => x.ID == reviewId);
+            var pid = expReview?.PersonId;
 
-            var company = _context.Companies.FirstOrDefault(u => u.UsersId == id);
-            var cid = company?.ID;
-
-            var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
+            var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId==pid);
             var status = appStatus?.Status;
 
             if (appStatus is not null)
@@ -76,18 +70,13 @@ namespace Alesta03.Controllers.CompanyController
             return Ok("Deneyimi Onayladınız");
         }
 
-
-        [HttpPut("deneyim reddetme"), Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<ApprovalStatus>> NegativeApp()
+        [HttpPut("deneyim reddetme,{deneyimId}"), Authorize(Roles = Role.Admin)]
+        public async Task<ActionResult<ApprovalStatus>> NegativeApp(int reviewId)
         {
-            var mail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
-            var id = user?.ID;
+            var expReview = _context.ExpReviews.FirstOrDefault(x => x.ID == reviewId);
+            var pid = expReview?.PersonId;
 
-            var company = _context.Companies.FirstOrDefault(u => u.UsersId == id);
-            var cid = company?.ID;
-
-            var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
+            var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId == pid);
             var status = appStatus?.Status;
 
             if (appStatus is not null)
@@ -96,7 +85,7 @@ namespace Alesta03.Controllers.CompanyController
 
             await _context.SaveChangesAsync();
 
-            return Ok("Deneyimi Reddediniz");
+            return Ok("Deneyimi Onayladınız");
         }
 
     }

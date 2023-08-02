@@ -18,5 +18,8 @@ namespace Alesta03.Model
                 
         public int ?CompanyId { get; set; }
         public Company Company { get; set; }
+
+        public int? PersonId { get; set; }
+        public Person person { get; set; }
     }
 }
