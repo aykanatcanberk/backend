@@ -24,48 +24,46 @@ namespace Alesta03.Controllers.PersonController
         }
 
 
-        [HttpPost, Authorize(Roles = Role.User)]
-        public async Task<ActionResult<ExpReview>> AddReview(AddReviewRequest request)
+        [HttpPost("CompanyId,BackWorkId"), Authorize(Roles = Role.User)]
+        public async Task<ActionResult<ExpReview>> AddReview(AddReviewRequest request,int companyId, int backWorkId)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
             var id = user?.ID;
 
-            var person = _context.People.FirstOrDefault(u => u.UsersId == id);
+            var person = _context.People.FirstOrDefault(x => x.UsersId == id);
             var pid = person?.ID;
+            var cid = companyId;
             var name = person?.Name;
             var surname = person?.Surname;
 
-            var workStatus = _context.WorkStatuses.FirstOrDefault(x => x.PersonId == pid);
-            var pwid = workStatus?.BackWorkId;
 
-            var backWork = _context.BackWorks.FirstOrDefault(x => x.ID == pwid);
-            var bpwid = backWork?.ID;
+            var company = _context.Companies.FirstOrDefault(x => x.ID == companyId);
+            var cname = company?.Name;
 
-            var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.BackWorkId == bpwid);
+            var appStatus = _context.ApprovalStatuses
+                .Where(x => x.CompanyId == companyId)
+                .Where(x => x.BackWorkId == backWorkId)
+                .Where(x => x.Status == "o");
+
+            if (appStatus == null) return BadRequest("Deneyiminiz Yok Ya da Onaylı Değil!");
+
             
-            if (appStatus == null) return NotFound("Kullanıcı Bulunamadı");
-            if (appStatus.Status is "b") return BadRequest("Yetkiniz Bulunamamkta");
-            else if (appStatus.Status is "r") return BadRequest("Yetkiniz Bulunamamkta");
-
-            var eml = backWork?.CompanyMail;
-            var k = _context.Companies.FirstOrDefault(x => x.Users.Email == eml);
-            var copmanyid = k?.ID;
-            var cname = k?.Name;
-
             ExpReview expReview = new ExpReview();
 
+            expReview.CompanyId = companyId;
             expReview.PersonId = pid;
-            expReview.Title = request.Title; 
+            expReview.Title = request.Title;
             expReview.Description = request.Description;
-            expReview.CompanyId = copmanyid;
-            
-
+            expReview.Date = DateTime.Now;
+            expReview.Name = name;
+            expReview.Surname = surname;
+            expReview.CompanyName = cname;
+           
             _context.ExpReviews.Add(expReview);
             await _context.SaveChangesAsync();
 
             AddReviewResponse response = new AddReviewResponse();
-
 
             response.Title = expReview.Title;
             response.Description = expReview.Description;
@@ -85,76 +83,32 @@ namespace Alesta03.Controllers.PersonController
             return Ok(expReviws);
         }
 
-        [HttpGet("kişinin kendi yazdıkları"), Authorize(Roles = Role.User)]
+        [HttpGet("Kişi"), Authorize(Roles = Role.User)]
         public async Task<ActionResult<ExpReview>> GetSingleReviews()
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
             var id = user?.ID;
 
+            var person = _context.People.FirstOrDefault(x => x.UsersId == id);
+            var pid = person?.ID;
+
             var expReviews = await _context.ExpReviews
-                 .Where(x => x.PersonId== id)
-                 .Select(u => new
+                 .Where(x => x.PersonId== pid)
+                 .Select(x => new
                  {
-                     title = u.Title,
-                     description = u.Description,
+                     title = x.Title,
+                     description = x.Description,
                      Date = DateTime.Now,
+                     name = x.Name,
+                     surname = x.Surname,
+                     cname = x.CompanyName
+
                  }).ToListAsync();
+
             return Ok(expReviews);
 
         }
-
-        [HttpPut, Authorize(Roles = Role.User)]
-        public async Task<ActionResult<List<ExpReview>>> UpdateReview(UpdateReviewRequest request)
-        {
-            var mail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
-            var id = user?.ID;
-
-
-            if (user == null) return NotFound("Kişi Bulunumadı!");
-
-            var person = _context.People.FirstOrDefault(u => u.UsersId == id);
-            var pid = person?.ID; 
-
-            if (person == null) return NotFound("Kişi Bulunumadı!");
-
-            var name = person?.Name;
-            var surname = person?.Surname;
-
-            var workStatus = _context.WorkStatuses.FirstOrDefault(x => x.PersonId == pid);
-            var pwid = workStatus?.BackWorkId;
-
-            var backWork = _context.BackWorks.FirstOrDefault(x => x.ID == pwid);
-            var bpwid = backWork?.ID;
-
-            var eml = backWork?.CompanyMail;
-            var k = _context.Companies.FirstOrDefault(x => x.Users.Email == eml);
-            var copmanyid = k?.ID;
-            var cname = k?.Name;
-
-            var expReview = _context.ExpReviews.FirstOrDefault(x => x.PersonId == pid);
-
-            expReview.PersonId = pid;
-            expReview.Title = request.Title;
-            expReview.Description = request.Description;
-            expReview.CompanyId = copmanyid;
-
-            _context.ExpReviews.Add(expReview);
-            await _context.SaveChangesAsync();
-
-            UpdateReviewResponse response = new UpdateReviewResponse();
-
-
-            response.Title = expReview.Title;
-            response.Description = expReview.Description;
-            response.UpdateDate = DateTime.Now;
-
-            return Ok(response);
-
-        }
-
-
 
     }
 }
