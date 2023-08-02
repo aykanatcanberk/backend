@@ -20,7 +20,7 @@ namespace Alesta03.Controllers.GeneralController
         {
             _context = context;
         }
-        [Route("api/[controller]/person")]
+        [Route("api/[controller]/personpage")]
 
         [HttpGet,Authorize]
         public async Task<ActionResult<Advert>> GetAllAdvertPerson()
@@ -38,33 +38,46 @@ namespace Alesta03.Controllers.GeneralController
 
         }
 
-        [Route("api/[controller]/company")]
+        [Route("api/[controller]/companypage")]
         [HttpGet, Authorize]
         public async Task<ActionResult<Advert>> GetAllAdvertCompany()
         {
-            var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
-            var responseList = adverts.Select(advert => new GetAllAdvertCompanyResponse
-            {         
-                AdvertName = advert.AdvertName,
-                AdvertDate = advert.AdvertDate,
-                Description = advert.Description,
-                AdvertType = advert.AdvertType,
-            }).ToList();
-            return Ok(responseList);
+            var userName = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(x => x.Email == userName);
+            var userId = user?.ID;
 
+            if (userId == null)
+                return Unauthorized();
+
+            var adverts = await _context.Adverts
+                .Where(advert => advert.UserId == userId && !advert.IsDeleted)
+                .Select(advert => new GetAllAdvertCompanyResponse
+                {
+                    AdvertName = advert.AdvertName,
+                    AdvertDate = advert.AdvertDate,
+                    Description = advert.Description,
+                    AdvertType = advert.AdvertType,
+                })
+                .ToListAsync();
+            return Ok(adverts);
         }
 
-        [HttpGet("{id}"),Authorize]
-        public async Task<ActionResult<Advert>> GetSingleAdvert(int id)
+        [HttpGet,Authorize]
+        public async Task<ActionResult<Advert>> GetSingleAdvert()
         {
-            var model = await _context.Adverts.FindAsync(id);
+            var userMail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
+            var id = user?.ID;
+
+            var AdvertId = _context.Adverts.FirstOrDefault(x => x.UserId == id).Id;
+            var model = await _context.Adverts.FindAsync(AdvertId);
             var control = model.IsDeleted;
             if (model is null)
                 return null;
             if (control is true)
                 return null;
-            GetAdvertResponse response = new GetAdvertResponse();
 
+            GetAdvertResponse response = new GetAdvertResponse();
             response.AdvertName = model.AdvertName;
             response.AdvertDate = model.AdvertDate;
             response.Description = model.Description;
@@ -84,11 +97,12 @@ namespace Alesta03.Controllers.GeneralController
             if (user == null)
                 return NotFound("Kullanıcı Bulunamadı!");
 
+            var CompName = _context.Companies.FirstOrDefault(x => x.UsersId == id).Name;
             var model = _context.Adverts.FirstOrDefault(x => x.UserId == id);
             if (model is not null) return NotFound("Daha Bu İlan Atılmış.");
 
             model.UserId = id;
-            model.CompanyName = userMail;
+            model.CompanyName = CompName;
             model.AdvertName = request.AdvertName;
             model.AdvertDate = DateTime.Now;
             model.Description = request.Description;
@@ -112,22 +126,5 @@ namespace Alesta03.Controllers.GeneralController
             return Ok(response);
         }
 
-        [HttpDelete("{id}"), Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<List<Advert>>> DeleteAdvert(int id)
-        {
-            Advert model = new Advert();
-            var control = model.IsDeleted;
-            var review = await _context.Adverts.FindAsync(id);
-            if (review is null)
-                return null;
-            if (control is true)
-                return null;
-            model.IsDeleted = review.IsDeleted;
-            model.IsDeleted = true;
-
-            DeleteAdvertResponse response = new DeleteAdvertResponse();
-            await _context.SaveChangesAsync();
-            return Ok(response);
-        }
     }
 }

@@ -45,7 +45,7 @@ namespace Alesta03.Controllers.GeneralController
         }
 
         [HttpGet("PersonPosts"), Authorize]
-        public async Task<ActionResult<Post>> GetSinglePost()
+        public async Task<ActionResult<Post>> GetPersonPosts()
         {
             var mail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);

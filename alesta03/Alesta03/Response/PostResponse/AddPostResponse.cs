@@ -7,7 +7,7 @@ namespace Alesta03.Response.PostResponse
     {
         public int Id { get; set; }
         public int ?UserId { get; set; }
-        public string UserMail { get; set; }
+        public string UserName { get; set; }
         public string Content { get; set; }
         public DateTime PostDate { get; set; } = DateTime.Now;
     }
