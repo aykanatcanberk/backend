@@ -7,7 +7,7 @@
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string FDate { get; set; } = string.Empty;
-        public int TotalStaff { get; set; }     
+        public string TotalStaff { get; set; }     
         public string Location { get; set; } = string.Empty;
         public string Prof { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
