@@ -2,12 +2,12 @@
 {
     public class AddAdvertRequest
     {
-        public string? CompanyName { get; set; }
-        public string? AdvertName { get; set; }
-        public string? Description { get; set; }
-        public string? AdvertType { get; set; }
-        public string? Department { get; set; }
-        public string? WorkType { get; set; }
-        public string? WorkPreference { get; set; }
+        public string? CompanyName { get; set; } = string.Empty;
+        public string? AdvertName { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
+        public string? AdvertType { get; set; } = string.Empty;
+        public string? Department { get; set; } = string.Empty;
+        public string? WorkType { get; set; } = string.Empty;
+        public string? WorkPreference { get; set; } = string.Empty;
     }
 }

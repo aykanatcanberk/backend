@@ -29,8 +29,8 @@ builder.Services.AddScoped<IPersonInfoWorkService, PersonInfoWorkService>();
 builder.Services.AddScoped<IPersonInfoEduService, PersonInfoEduService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPostService, PostService>();    
-builder.Services.AddScoped<IAdvertService, AdvertService>();
-builder.Services.AddScoped<IAdvertApprovalService, AdvertApprovalService>();
+//builder.Services.AddScoped<IAdvertService, AdvertService>();
+//builder.Services.AddScoped<IAdvertApprovalService, AdvertApprovalService>();
 
 builder.Services.AddDbContext<DataContext>();
 
