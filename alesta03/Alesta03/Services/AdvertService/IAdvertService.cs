@@ -13,3 +13,4 @@ namespace Alesta03.Services.AdvertService
         Task<DeleteAdvertResponse?> DeleteAdvert(int id);
     }
 }
+

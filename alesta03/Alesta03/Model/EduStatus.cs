@@ -9,10 +9,10 @@ namespace Alesta03.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
-        public Person Person { get; set; }
+        public List<Person> Persons{ get; set; }
         public int ?PersonId { get; set; }
 
         public BackEdu BackEdu { get; set; }
-        public int ?BackEduId { get; set; }
-    }
+            public int ?BackEduId { get; set; }
+        }
 }

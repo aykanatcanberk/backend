@@ -2,6 +2,6 @@
 {
     public class DeleteAdvertResponse
     {
-        public string Message { get; set; } = "Silme İşlemi Gerçekleşti.";
+        public string Message { get; set; } = "Başvurunuzun İptali Gerçekleşti.";
     }
 }
