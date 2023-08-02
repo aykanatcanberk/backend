@@ -75,10 +75,13 @@ namespace Alesta03.Services.GeneralService
 
         }
 
-        public async Task<ActionResult<string>> Login(UserDto request)
+        public async Task<ActionResult<string>> LoginPerson(UserDto request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-           
+            string control = user.UserType;
+
+            if (control is "Company") 
+                return null;
             if (user.Email != request.Email) 
                 return null;
             else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash)) 
@@ -99,6 +102,33 @@ namespace Alesta03.Services.GeneralService
             return json;
         }
 
+
+        public async Task<ActionResult<string>> LoginCompany(UserDto request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            string control = user.UserType;
+
+            if (control is "Person")
+                return null;
+            if (user.Email != request.Email)
+                return null;
+            else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                return null;
+            else if (user.UserType != user.UserType)
+                return null;
+
+            string token = CreateToken(user);
+            await _context.SaveChangesAsync();
+
+            LoginResult loginResult = new LoginResult
+            {
+                token = token,
+                control = user.IsFirstLogin
+            };
+
+            string json = JsonConvert.SerializeObject(loginResult);
+            return json;
+        }
 
         private string CreateToken(User user)
         {
