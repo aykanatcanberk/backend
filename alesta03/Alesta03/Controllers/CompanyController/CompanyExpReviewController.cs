@@ -24,7 +24,7 @@ namespace Alesta03.Controllers.CompanyController
             var id = user?.ID;
 
             var expReviews = await _context.ExpReviews
-                 .Where(x => x.PersonId == id)
+                 .Where(x => x.CompanyId == id)
                  .Select(u => new
                  {
                      title = u.Title,
