@@ -8,6 +8,7 @@ namespace Alesta03.Model
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
+        public int EduStatusId{ get; set; }
         public string SchoolName { get; set; }
         public string DepartmentName { get; set; }
         public string SchoolType { get; set; }

@@ -1,5 +1,4 @@
-﻿
-using Alesta03.Model;
+﻿using Alesta03.Model;
 using Alesta03.Request.AddRequest;
 using Alesta03.Request.PostRequest;
 using Alesta03.Request.UpdateRequest;
@@ -66,15 +65,20 @@ namespace Alesta03.Controllers.GeneralController
             var id = user?.ID;
             if (user == null)
                 return NotFound("Gönderi Bulunamadı!");
-
             var model = _context.Posts.FirstOrDefault(x => x.UserId == id);
             if (model == null)
                 return NotFound("Gönderi Bilgisi Bulunamadı!");
+
+            var company=_context.Companies.FirstOrDefault(y => y.UsersId == id);
             var person = _context.People.FirstOrDefault(y => y.UsersId == id);
 
-            var name = person.Name;
+           
+           
 
-            var _post = await _context.Posts
+            if(user.UserType=="Person")
+            {
+                var name = person.Name;
+                var _post = await _context.Posts
                 .Where(aa => aa.UserId == id)
                 .Select(aa => new GetPostResponse
                 {
@@ -83,6 +87,20 @@ namespace Alesta03.Controllers.GeneralController
                     PostDate = aa.PostDate,
                 }).ToListAsync();
             return Ok(_post);
+            }
+            else
+            {
+                var cname=company.Name;
+                 var _post = await _context.Posts
+                .Where(aa => aa.UserId == id)
+                .Select(aa => new GetPostResponse
+                {
+                    Name = cname,
+                    Content = aa.Content,
+                    PostDate = aa.PostDate,
+                }).ToListAsync();
+            return Ok(_post);
+            }  
         }
 
         [HttpPost, Authorize]

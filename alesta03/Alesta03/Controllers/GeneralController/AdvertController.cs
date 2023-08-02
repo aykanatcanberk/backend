@@ -62,14 +62,14 @@ namespace Alesta03.Controllers.GeneralController
             return Ok(adverts);
         }
 
-        [HttpGet,Authorize]
-        public async Task<ActionResult<Advert>> GetSingleAdvert()
+        [HttpGet("{idd}"), Authorize]
+        public async Task<ActionResult<Advert>> GetSingleAdvert(int idd)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
             var id = user?.ID;
 
-            var AdvertId = _context.Adverts.FirstOrDefault(x => x.UserId == id).Id;
+            var AdvertId = idd;
             var model = await _context.Adverts.FindAsync(AdvertId);
             var control = model.IsDeleted;
             if (model is null)
