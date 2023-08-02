@@ -53,11 +53,13 @@ namespace Alesta03.Controllers.GeneralController
             return result;
         }
 
-        [HttpPost("login")]
-        public ActionResult<User> Login(UserDto request)
+        [HttpPost("loginPerson")]
+        public ActionResult<User> LoginPerson(UserDto request)
         {
             var user = _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            
+            string control = user.Result.UserType;
+            if (control is "Company") return BadRequest("Kullanıcı Tipiniz Yanlış");
+
             if (user.Result is null) 
             {
                 return BadRequest("Kullanıcı  Bulunamadı!"); 
@@ -80,9 +82,42 @@ namespace Alesta03.Controllers.GeneralController
             
 
             string token = CreateToken(user.Result);
-            bool control = user.Result.IsFirstLogin;
+            bool login = user.Result.IsFirstLogin;
 
-            return Ok(new { token, control });
+            return Ok(new { token, login });
+        }
+
+        [HttpPost("loginCompany")]
+        public ActionResult<User> LoginCompany(UserDto request)
+        {
+            var user = _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            string control = user.Result.UserType;
+            if(control is "Person") return BadRequest("Kullanıcı Tipiniz Yanlış");
+            if (user.Result is null)
+            {
+                return BadRequest("Kullanıcı  Bulunamadı!");
+            }
+
+            if (user is null)
+            {
+                return BadRequest("Kullanıcı  Bulunamadı!");
+            }
+
+            else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Result.PasswordHash))
+            {
+                return BadRequest("Yanlış Şifre!");
+            }
+            else if (user.Result.UserType != user.Result.UserType)
+            {
+                return BadRequest("Kullanıcı Türünüz Yanlış!");
+            }
+
+
+
+            string token = CreateToken(user.Result);
+            bool login = user.Result.IsFirstLogin;
+
+            return Ok(new { token, login });
         }
 
         private string CreateToken(User user)
