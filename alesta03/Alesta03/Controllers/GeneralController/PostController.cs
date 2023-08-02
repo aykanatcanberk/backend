@@ -1,7 +1,9 @@
 ﻿
+using Alesta03.Model;
 using Alesta03.Request.AddRequest;
 using Alesta03.Request.PostRequest;
 using Alesta03.Request.UpdateRequest;
+using Alesta03.Response.AdvertApproval_Response;
 using Alesta03.Response.PostResponse;
 using Alesta03.Services.PersonServices.ExpReviewService;
 using Alesta03.Services.PostServices;
@@ -23,35 +25,46 @@ namespace Alesta03.Controllers.GeneralController
             _context = context;
         }
 
-        [HttpGet ,Authorize]
+        [HttpGet("AllPosts"),Authorize]
         public async Task<ActionResult<Post>> GetAllPosts()
         {
-            var userMail = User?.Identity?.Name;
+            var mail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
+            var id = user?.ID;
+            if (user == null)
+                return NotFound("Gönderi Bulunamadı!");
+
             var posts = await _context.Posts.Where(post => !post.IsDeleted).ToListAsync();
             var responseList = posts.Select(post => new GetAllPostResponse
-            {
+            {   
+                Name = _context.People.FirstOrDefault(x => x.UsersId == id).Name,
                 Content = post.Content,
                 PostDate = post.PostDate,
-                UserMail=post.UserMail
             }).ToList();
             return Ok(responseList);
         }
 
-        [HttpGet("{id}") ,Authorize]
-        public async Task<ActionResult<Post>> GetSinglePost(int id)
+        [HttpGet("PersonPosts"), Authorize]
+        public async Task<ActionResult<Post>> GetSinglePost()
         {
-            var userMail = User?.Identity?.Name;
-            var model = await _context.Posts.FindAsync(id);
-            var control = model.IsDeleted;
-            if (model is null)
-                return null;
-            if (control is true)
-                return null;
-            GetPostResponse response = new GetPostResponse();
-            response.UserMail = model.UserMail;
-            response.Content = model.Content;
-            response.PostDate = model.PostDate;
-            return Ok(response);
+            var mail = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
+            var id = user?.ID;
+            if (user == null)
+                return NotFound("Gönderi Bulunamadı!");
+
+            var model = _context.Posts.FirstOrDefault(x => x.UserId == id);
+            if (model == null) 
+                return NotFound("Gönderi Bilgisi Bulunamadı!");
+           var name= _context.People.FirstOrDefault(x => x.UsersId == id).Name;
+            var _post = await _context.Posts
+                .Where(aa => aa.UserId == id)
+                .Select(aa => new GetPostRequest
+                {   Name=name,
+                    Content = aa.Content,
+                    PostDate = aa.PostDate,
+                }).ToListAsync();
+            return Ok(_post);
         }
 
         [HttpPost, Authorize]
@@ -67,42 +80,45 @@ namespace Alesta03.Controllers.GeneralController
             if (model is not null) return NotFound("Daha Bu Post Atılmış.");
 
                 model.UserId = id;
-                model.UserMail = userName;
                 model.Content = request.Content;
                 model.PostDate = DateTime.Now;
 
                 _context.Posts.Add(model);
                 await _context.SaveChangesAsync();
 
-                AddPostResponse response = new AddPostResponse();
-                response.UserMail= userName;
-                response.Id=model.Id; 
-                response.UserId = (int)model.UserId;
+
+            var name = _context.People.FirstOrDefault(x => x.UsersId == id).Name;
+
+            AddPostResponse response = new AddPostResponse();
+                response.UserName= name;
+                response.PostDate = model.PostDate;
                 response.Content = model.Content;
 
                 return Ok(response);
         }
 
-        [HttpDelete("{id}") ,Authorize]
-        public async Task<ActionResult<List<Post>>> DeletePost(int id)
+        [HttpDelete, Authorize]
+        public async Task<ActionResult<List<Post>>> DeletePost()
         {
-            Post model = new Post();
+            
+            var userName = User?.Identity?.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == userName);
+            var userId = user?.ID;
 
-            bool control = model.IsDeleted;
-
-            var review = await _context.Posts.FindAsync(id);
-
-            if (review ==null||control==true)
-                return null;
-
-            model.IsDeleted = review.IsDeleted;
-
-            model.IsDeleted = true;
-
-            DeletePostResponse response = new DeletePostResponse();
-
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.UserId == userId && !p.IsDeleted);
+           
+            if (post == null)
+            {
+                return NotFound("Gönderi Bulunamadı.");
+            }
+            post.IsDeleted = true;
             await _context.SaveChangesAsync();
 
+            DeletePostResponse response = new DeletePostResponse();
             return Ok(response);
         }
     }
