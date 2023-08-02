@@ -12,10 +12,7 @@ namespace Alesta03.Model
         public int ID { get; set; }
         public string Title { get; set; }
         public DateTime Date { get; set; }
-        public DateTime UpdateDate { get; set; }
         public string Description { get; set; }
-
-        public bool IsDeleted { get; set; }
 
         public Person Person { get; set; }
         public int ?PersonId { get; set; }

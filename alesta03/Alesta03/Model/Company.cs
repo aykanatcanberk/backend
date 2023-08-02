@@ -18,15 +18,13 @@ namespace Alesta03.Model
         public string Prof { get; set; }
         public string Phone { get; set; }
         public string Website { get; set; }
-        public string ?Image { get; set; }
-        public DateTime UpdateDate { get; set; }  
+        public string ?Image { get; set; }  
 
         public User Users { get; set; }
         public int ?UsersId { get; set; }
 
         public List<ExpReview> Reviews { get; set; }
 
-        public List<BackEdu> BackEdus { get; set; }
-
+        public List<ApprovalStatus> ApprovalStatuses { get; set; }
     }
 }

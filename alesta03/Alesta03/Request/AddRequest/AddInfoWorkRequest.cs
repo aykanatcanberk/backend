@@ -1,8 +1,8 @@
-﻿namespace Alesta03.Request.UpdateRequest
+﻿namespace Alesta03.Request.AddRequest
 {
-    public class UpdateInfoWorkRequest
+    public class AddInfoWorkRequest
     {
-        public string CompanyMail { get; set; } = string.Empty;
+        public string CompanyEmail { get; set; }
         public string DepartmentName { get; set; } = string.Empty;
         public string EmployeeID { get; set; }
         public string AppLetter { get; set; }

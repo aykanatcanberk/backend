@@ -14,7 +14,6 @@ namespace Alesta03.Model
         public string Phone { get; set; }
         public string Location { get; set; }
         public string ?Image { get; set; }
-        public DateTime UpdateDate { get; set; }
 
         public User Users { get; set; }
         public int ?UsersId { get; set; }

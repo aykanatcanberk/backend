@@ -22,7 +22,7 @@ namespace Alesta03.Controllers.PersonController
         }
         
         [HttpGet,Authorize(Roles = Role.User)]
-        public async Task<ActionResult<Person>> GetSinglePerson()
+        public async Task<ActionResult<List<Person>>> GetSinglePerson()
         {
             var mail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);
@@ -41,11 +41,12 @@ namespace Alesta03.Controllers.PersonController
             response.Phone = model.Phone;
             response.Location = model.Location;
 
+
             return Ok(response);
         }
 
         [HttpPut,Authorize(Roles = Role.User)]
-        public async Task<ActionResult<List<Person>>> UpdateProfile(UpdatePProfileRequest request)
+        public async Task<ActionResult<Person>> UpdateProfile(UpdatePProfileRequest request)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
@@ -70,7 +71,6 @@ namespace Alesta03.Controllers.PersonController
             response.Birthday = model.Birthday;
             response.Phone = model.Phone;
             response.Location = model.Location;
-            response.UpdateDate = model.UpdateDate;
 
             await _context.SaveChangesAsync();
 
@@ -79,7 +79,7 @@ namespace Alesta03.Controllers.PersonController
 
         [HttpPost, Authorize(Roles = Role.User)]
 
-        public async Task<ActionResult<List<Person>>> AddProfileInfo(AddPProfileRequest request)
+        public async Task<ActionResult<Person>> AddProfileInfo(AddPProfileRequest request)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == userMail);

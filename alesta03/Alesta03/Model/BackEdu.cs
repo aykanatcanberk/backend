@@ -13,10 +13,6 @@ namespace Alesta03.Model
         public string SchoolType { get; set; }
         public bool EduStatus { get; set; }
         public float Avg { get; set; }
-        public DateTime UpdateDate { get; set; }
-
-        public Company Company { get; set; }
-        public int ?CompanyId { get; set; }
 
         public List<EduStatus> EduStatuses { get; set; }
        

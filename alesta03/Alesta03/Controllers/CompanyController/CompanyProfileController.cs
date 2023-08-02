@@ -55,7 +55,7 @@ namespace Alesta03.Controllers.CompanyController
         }
 
         [HttpPut, Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<List<Company>>> UpdateProfile(UpdateCProfileRequest request)
+        public async Task<ActionResult<Company>> UpdateProfile(UpdateCProfileRequest request)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
@@ -90,7 +90,6 @@ namespace Alesta03.Controllers.CompanyController
             response.Prof = model.Prof;
             response.Phone = model.Phone;
             response.Website = model.Website;
-            response.UpdateDate = model.UpdateDate;
 
             await _context.SaveChangesAsync();
 
@@ -99,7 +98,7 @@ namespace Alesta03.Controllers.CompanyController
 
         [HttpPost, Authorize(Roles = Role.Admin)]
 
-        public async Task<ActionResult<List<Company>>> AddProfileInfo(AddCProfileRequest request)
+        public async Task<ActionResult<Company>> AddProfileInfo(AddCProfileRequest request)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
@@ -141,5 +140,6 @@ namespace Alesta03.Controllers.CompanyController
             return Ok(response);
 
         }
+
     }
 }
