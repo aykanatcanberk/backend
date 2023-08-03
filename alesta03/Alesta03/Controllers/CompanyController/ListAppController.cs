@@ -28,37 +28,36 @@ namespace Alesta03.Controllers.CompanyController
             var cname = company?.Name;           
 
             var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
-            var bwid = appStatus?.BackWorkId;
+            var sta = appStatus?.Status;
 
 
             var app = await _context.WorkStatuses
-                .Where(x => appStatus.Status == "b")
+                .Where(x => sta == "b")
                 .ToListAsync();
 
             return Ok(app);
         }
 
 
-        [HttpPut("deneyim onaylama,{deneyimId,backWorkId}"), Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<ApprovalStatus>> PozitiveApp(int reviewId,int backWorkId)
+        [HttpPut("deneyim onaylama,{deneyimId}"), Authorize(Roles = Role.Admin)]
+        public async Task<ActionResult<ApprovalStatus>> PozitiveApp(int reviewId)
         {
             var expReview = _context.ExpReviews.FirstOrDefault(x => x.ID == reviewId);
             var pid = expReview?.PersonId;
 
-            var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId==pid &&  x.BackWorkId == backWorkId);
-            var status = appStatus?.Status;
-
+            var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId==pid);
+            
             if (appStatus is null) return BadRequest("Deneyim bulunamadı");
 
-            if (appStatus.Status is "b")
+            if (appStatus.Status == "b")
             {
-                ApprovalStatus model = new ApprovalStatus();
-
-                model.Status = "o";
-                await _context.SaveChangesAsync();
+                appStatus.Status = "o";
+                
             }
 
-            return Ok("Deneyimi Onayladınız");
+            await _context.SaveChangesAsync();
+
+            return Ok("Deneyimi Onyaladınız");
         }
 
         [HttpPut("deneyim reddetme,{deneyimId}"), Authorize(Roles = Role.Admin)]
@@ -68,16 +67,16 @@ namespace Alesta03.Controllers.CompanyController
             var pid = expReview?.PersonId;
 
             var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId == pid);
+            var status = appStatus?.Status;
 
             if (appStatus is null) return BadRequest("Deneyim bulunamadı");
 
-            if (appStatus.Status is "b")
+            if (appStatus.Status == "b")
             {
-                ApprovalStatus model = new ApprovalStatus();
+                appStatus.Status = "r";
 
-                model.Status = "r";
-                await _context.SaveChangesAsync();
             }
+            await _context.SaveChangesAsync();
 
             return Ok("Deneyimi Reddeddiniz");
         }

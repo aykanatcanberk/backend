@@ -25,7 +25,7 @@ namespace Alesta03.Controllers.PersonController
         }
 
         [HttpGet("{companyId}"), Authorize(Roles = Role.User)]
-        public async Task<ActionResult<Company>> GetSingleProfiles(int companyid)
+        public async Task<ActionResult<Company>> GetSingleProfiles(int companyId)
         {
             var mail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);
@@ -33,7 +33,7 @@ namespace Alesta03.Controllers.PersonController
             if (user == null)
                 return NotFound("Firma Bulunumadı!");
 
-            var model = _context.Companies.FirstOrDefault(x => x.UsersId == companyid);
+            var model = _context.Companies.FirstOrDefault(x => x.UsersId == companyId);
             if (model == null) return NotFound("Firma Bilgisi Bulunamadı!");
 
             GetCompanyProfileResponse response = new GetCompanyProfileResponse();
