@@ -42,8 +42,6 @@ namespace Alesta03.Controllers.PersonController
 
             if (model == null) return NotFound("Kişi Onay Durumu Bulunamadı!");
 
-            await _context.SaveChangesAsync();
-
             return Ok(model.Status);
         }
 
