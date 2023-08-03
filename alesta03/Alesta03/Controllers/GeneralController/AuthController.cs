@@ -1,10 +1,11 @@
 ﻿using Alesta03.Request.DtoRequest;
 using Alesta03.Request.RgeisterRequest;
-using Alesta03.Services.GeneralService;
+using Alesta03.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -21,13 +22,11 @@ namespace Alesta03.Controllers.GeneralController
         public static RegisterRequestUC RegisterRequest { get; set; }
 
         private readonly IConfiguration _configuration;
-        private readonly IAuthService _authService;
         private readonly DataContext _context;
 
-        public AuthController(IConfiguration configuration,IAuthService authService, DataContext context)
+        public AuthController(IConfiguration configuration,DataContext context)
         {
             _configuration = configuration;
-            _authService = authService;
             _context = context;
         }
 
@@ -39,8 +38,23 @@ namespace Alesta03.Controllers.GeneralController
             {
                 return BadRequest("E-Posta daha önce kaydedilmiş!");
             }
-            var result = await _authService.RegisterCompany(request);
-            return result;
+
+            string passwordHash
+                = BCrypt.Net.BCrypt.HashPassword(request.UserDto.Password);
+
+            Company company = new Company();
+            User user = new User();
+
+            company.Name = request.CompanyDto.Name;
+
+            user.Email = request.UserDto.Email;
+            user.UserType = "Company";
+            user.PasswordHash = passwordHash;
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return user;
         }
         [HttpPost("registerPerson")]
         public async Task<ActionResult<User>> RegisterPerson(RegisterRequestUP request)
@@ -49,75 +63,88 @@ namespace Alesta03.Controllers.GeneralController
             {
                 return BadRequest("E-Posta daha önce kaydedilmiş!");
             }
-            var result = await _authService.RegisterPerson(request);
-            return result;
+
+            string passwordHash
+                = BCrypt.Net.BCrypt.HashPassword(request.UserDto.Password);
+
+            Person person = new Person();
+            User user = new User();
+
+
+            person.Name = request.PersonDto.Name;
+            person.Surname = request.PersonDto.Surname;
+
+            user.Email = request.UserDto.Email;
+            user.UserType = "Person";
+            user.PasswordHash = passwordHash;
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return user;
+
         }
 
         [HttpPost("loginPerson")]
-        public ActionResult<User> LoginPerson(UserDto request)
+        public ActionResult<string> LoginPerson(UserDto request)
         {
             var user = _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            string control = user.Result.UserType;
-            if (control is "Company") return BadRequest("Kullanıcı Tipiniz Yanlış");
 
             if (user.Result is null) 
-            {
                 return BadRequest("Kullanıcı  Bulunamadı!"); 
-            }
-
+            
             if (user is null)
-            {
                 return BadRequest("Kullanıcı  Bulunamadı!");
-            }
 
             else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Result.PasswordHash))
-            {
                 return BadRequest("Yanlış Şifre!");
-            }
-            else if (user.Result.UserType != user.Result.UserType)
-            {
-                return BadRequest("Kullanıcı Türünüz Yanlış!");
-            }
-
             
+            else if (user.Result.UserType != user.Result.UserType)
+                return BadRequest("Kullanıcı Türünüz Yanlış!");
+
 
             string token = CreateToken(user.Result);
             bool login = user.Result.IsFirstLogin;
 
-            return Ok(new { token, login });
+            LoginResult loginResult = new LoginResult
+            {
+                token = token,
+                control = user.Result.IsFirstLogin
+            };
+
+            string json = JsonConvert.SerializeObject(loginResult);
+            return json;
         }
 
         [HttpPost("loginCompany")]
-        public ActionResult<User> LoginCompany(UserDto request)
+        public ActionResult<string> LoginCompany(UserDto request)
         {
             var user = _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            string control = user.Result.UserType;
-            if(control is "Person") return BadRequest("Kullanıcı Tipiniz Yanlış");
+
             if (user.Result is null)
-            {
                 return BadRequest("Kullanıcı  Bulunamadı!");
-            }
 
             if (user is null)
-            {
                 return BadRequest("Kullanıcı  Bulunamadı!");
-            }
 
             else if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Result.PasswordHash))
-            {
                 return BadRequest("Yanlış Şifre!");
-            }
-            else if (user.Result.UserType != user.Result.UserType)
-            {
-                return BadRequest("Kullanıcı Türünüz Yanlış!");
-            }
 
+            else if (user.Result.UserType != user.Result.UserType)
+                return BadRequest("Kullanıcı Türünüz Yanlış!");
 
 
             string token = CreateToken(user.Result);
             bool login = user.Result.IsFirstLogin;
 
-            return Ok(new { token, login });
+            LoginResult loginResult = new LoginResult
+            {
+                token = token,
+                control = user.Result.IsFirstLogin
+            };
+
+            string json = JsonConvert.SerializeObject(loginResult);
+            return json;
         }
 
         private string CreateToken(User user)

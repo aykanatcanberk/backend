@@ -1,10 +1,6 @@
 global using Alesta03.Model;
 global using Alesta03.Data;
-using Alesta03.Services.CompanyServices.ProfileService;
-using Alesta03.Services.GeneralService;
-using Alesta03.Services.PersonServices.ExpReviewService;
-using Alesta03.Services.PersonServices.InfoService;
-using Alesta03.Services.PersonServices.ProfileService;
+
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -22,12 +18,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IExpReviewService, ExpReviewService>();
-//builder.Services.AddScoped<ICProfileService, CProfileService>();
-builder.Services.AddScoped<IPProfileService, PProfileService>();
-builder.Services.AddScoped<IPersonInfoWorkService, PersonInfoWorkService>();
-builder.Services.AddScoped<IPersonInfoEduService, PersonInfoEduService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+
+
+
 builder.Services.AddScoped<IPostService, PostService>();    
 //builder.Services.AddScoped<IAdvertService, AdvertService>();
 //builder.Services.AddScoped<IAdvertApprovalService, AdvertApprovalService>();
