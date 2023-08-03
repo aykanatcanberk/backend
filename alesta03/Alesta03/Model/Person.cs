@@ -21,9 +21,8 @@ namespace Alesta03.Model
         public List<ExpReview> Reviews { get; set; }
 
         public List<EduStatus> EduStatuses { get; set; }
-        public int? EduStatusId { get; set; }
-
         public List<WorkStatus> WorkStatuses { get; set; }
+
         public List<AdvertApproval> AdvertApprovals { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace Alesta03.Model
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int? UserId { get; set; }
+        
         public string? CompanyName { get; set; }
         public string? AdvertName { get; set; }
         public DateTime? AdvertDate { get; set; }
@@ -18,7 +18,10 @@ namespace Alesta03.Model
         public string? WorkType { get; set; }
         public string? WorkPreference { get; set; }
         public bool IsDeleted { get; set; }
+
         public User User { get; set; }
+        public int? UserId { get; set; }
+
         public List<AdvertApproval> AdvertApprovals { get; set; }
 
     }
