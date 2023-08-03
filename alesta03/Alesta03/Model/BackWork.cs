@@ -13,8 +13,6 @@ namespace Alesta03.Model
         public string AppLetter { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-
-        public string CompanyMail { get; set; }
         public List<ApprovalStatus> ApprovalStatuses { get; set; }
         public List<WorkStatus> WorkStatuses { get; set; }
 

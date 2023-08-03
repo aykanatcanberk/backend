@@ -4,7 +4,6 @@ using Alesta03.Request.UpdateRequest;
 using Alesta03.Response.AddResponse;
 using Alesta03.Response.GetResponse;
 using Alesta03.Response.UpdateResponse;
-using Alesta03.Services.CompanyServices.ProfileService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

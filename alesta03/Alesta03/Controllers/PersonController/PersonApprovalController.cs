@@ -14,28 +14,10 @@ namespace Alesta03.Controllers.PersonController
             _context = context;
         }
 
-        [HttpPut, Authorize(Roles = Role.User)]
-        public async Task<ActionResult<ApprovalStatus>> AppWork()
+        [HttpPut("{backworkId}"), Authorize(Roles = Role.User)]
+        public async Task<ActionResult<ApprovalStatus>> AppWork(int backworkId)
         {
-            var userMail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
-            var id = user?.ID;
-            if (user is null) return Ok("Kullanıcı Bulunamadı!");
-            
-            var person = _context.People.FirstOrDefault(u => u.UsersId == id);
-            var pid = person?.ID;
-            if (person is null) return Ok("Kişi Bulunamadı!");
-
-            var workStatus = _context.WorkStatuses.FirstOrDefault(x => x.PersonId == pid);
-            var pwid = workStatus?.BackWorkId;
-            if (workStatus is null) return Ok("Kişi İş Durumu Bulunamadı");
-
-            var backWork = _context.BackWorks.FirstOrDefault(x => x.ID == pwid);
-            var bpwid = backWork?.ID;
-
-            if (backWork is null) return Ok("Kişi iş Geçmişi Bulunamadı");
-
-            var model = _context.ApprovalStatuses.FirstOrDefault(x => x.BackWorkId == bpwid);
+            var model = _context.ApprovalStatuses.FirstOrDefault(x => x.BackWorkId == backworkId);
 
             if (model == null) return NotFound("Kişi Onay Durumu Bulunamadı!");
 
