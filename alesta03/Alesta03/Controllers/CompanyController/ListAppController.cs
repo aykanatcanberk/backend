@@ -16,7 +16,7 @@ namespace Alesta03.Controllers.CompanyController
             _context = context;
         }
 
-        [HttpGet, Authorize(Roles = Role.Admin)]
+        [HttpGet(), Authorize(Roles = Role.Admin)]
         public async Task<ActionResult<List<BackWork>>> GetAllApp()
         {
             var mail = User?.Identity?.Name;
@@ -29,43 +29,34 @@ namespace Alesta03.Controllers.CompanyController
 
             var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
             var bwid = appStatus?.BackWorkId;
-            var status = appStatus?.Status;
 
-            var app = _context.WorkStatuses
-                .Where(u => u.BackWorkId == bwid)
-                .Where(x => status == "b")
-                .Select(u => new
-                {
-                    name =u.Person.Name,
-                    surname=u.Person.Surname,
-                    companyName = cname,
-                    companyEmail = mail,
-                    departmentName = u.BackWork.DepartmentName,
-                    employeeId = u.BackWork.EmployeeID,
-                    appletter = u.BackWork.AppLetter,
-                    startTime = u.BackWork.Start,
-                    endTime = u.BackWork.End,
-                    appStatus =status
-                }).ToList();
+
+            var app = await _context.WorkStatuses
+                .Where(x => appStatus.Status == "b")
+                .ToListAsync();
 
             return Ok(app);
         }
 
 
-        [HttpPut("deneyim onaylama,{deneyimId}"), Authorize(Roles = Role.Admin)]
-        public async Task<ActionResult<ApprovalStatus>> PozitiveApp(int reviewId)
+        [HttpPut("deneyim onaylama,{deneyimId,backWorkId}"), Authorize(Roles = Role.Admin)]
+        public async Task<ActionResult<ApprovalStatus>> PozitiveApp(int reviewId,int backWorkId)
         {
             var expReview = _context.ExpReviews.FirstOrDefault(x => x.ID == reviewId);
             var pid = expReview?.PersonId;
 
-            var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId==pid);
+            var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId==pid &&  x.BackWorkId == backWorkId);
             var status = appStatus?.Status;
 
-            if (appStatus is not null)
-                if (status is "b")
-                    status= "o";
+            if (appStatus is null) return BadRequest("Deneyim bulunamadı");
 
-            await _context.SaveChangesAsync();
+            if (appStatus.Status is "b")
+            {
+                ApprovalStatus model = new ApprovalStatus();
+
+                model.Status = "o";
+                await _context.SaveChangesAsync();
+            }
 
             return Ok("Deneyimi Onayladınız");
         }
@@ -77,13 +68,16 @@ namespace Alesta03.Controllers.CompanyController
             var pid = expReview?.PersonId;
 
             var appStatus = _context.ApprovalStatuses.FirstOrDefault(x => x.PersonId == pid);
-            var status = appStatus?.Status;
 
-            if (appStatus is not null)
-                if (status is "b")
-                    status = "r";
+            if (appStatus is null) return BadRequest("Deneyim bulunamadı");
 
-            await _context.SaveChangesAsync();
+            if (appStatus.Status is "b")
+            {
+                ApprovalStatus model = new ApprovalStatus();
+
+                model.Status = "r";
+                await _context.SaveChangesAsync();
+            }
 
             return Ok("Deneyimi Reddeddiniz");
         }

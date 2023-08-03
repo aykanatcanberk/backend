@@ -40,14 +40,13 @@ namespace Alesta03.Controllers.PersonController
             var company = _context.Companies.FirstOrDefault(x => x.ID == companyId);
             var cname = company?.Name;
 
-            var appStatus = _context.ApprovalStatuses
-                .Where(x => x.CompanyId == companyId)
-                .Where(x => x.BackWorkId == backWorkId)
-                .Where(x => x.Status == "o");
+            var appStatus = await _context.ApprovalStatuses.FirstOrDefaultAsync(x => x.CompanyId == companyId && x.BackWorkId == backWorkId);
 
-            if (appStatus == null) return BadRequest("Deneyiminiz Yok Ya da Onaylı Değil!");
+            if (appStatus == null) return BadRequest("Deneyiminiz Yok Ya da Onaylı Değil");
+            if(appStatus.Status is "r") return BadRequest("Deneyiminiz Reddedildi");
+            if (appStatus.Status is "b") return BadRequest("Deneyiminiz Beklemede");
 
-            
+
             ExpReview expReview = new ExpReview();
 
             expReview.CompanyId = companyId;
