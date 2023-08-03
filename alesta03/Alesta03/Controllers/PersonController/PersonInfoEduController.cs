@@ -22,43 +22,7 @@ namespace Alesta03.Controllers.PersonController
             _context = context;
         }
 
-        [HttpGet("get single"), Authorize(Roles = Role.User)]
-        public async Task<ActionResult<List<BackEdu>>> GetSingleEdu()
-        {
-            var mail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
-            var id = user?.ID;
-
-            if (user == null)
-                return NotFound("Kullanıcı Bulunumadı!");
-
-            var person = _context.People.FirstOrDefault(u => u.UsersId == id);
-            var pid = person?.ID;
-
-            if (person == null)
-                return NotFound("Kişi Bulunumadı!");
-
-            var model = _context.EduStatuses.FirstOrDefault(x => x.PersonId == pid);
-            if (model == null)
-                return NotFound("Kişi Eğitim Bilgisi Bulunamadı!");
-
-            var pwid = model.BackEduId;
-
-            var backEdu = _context.BackEdus.FirstOrDefault(x => x.ID == pwid);
-            if (backEdu == null)
-                return NotFound("Kişi Eğitim Geçmişi Bulunamadı!");
-
-            GetBackEduResponse response = new GetBackEduResponse();
-
-            response.SchoolName = backEdu.SchoolName;
-            response.DepartmentName = backEdu.DepartmentName;
-            response.SchoolType = backEdu.SchoolType;
-            response.EduStatus = backEdu.EduStatus;
-            response.Avg = backEdu.Avg;
-
-            return Ok(response);
-        }
-
+       
         [HttpPut, Authorize(Roles = Role.User)]
         public async Task<ActionResult<BackEdu>> UpdateEduInfo(UpdateInfoEduRequest request)
         {

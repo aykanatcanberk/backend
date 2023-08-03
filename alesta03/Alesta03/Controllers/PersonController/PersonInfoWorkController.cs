@@ -25,16 +25,11 @@ namespace Alesta03.Controllers.PersonController
             var user = _context.Users.FirstOrDefault(u => u.Email == mail);
             var id = user?.ID;
 
-            var company = _context.Companies.FirstOrDefault(x => x.ID == companyId);
-            var users = _context.Users.FirstOrDefault(x => x.ID == company.UsersId);
-
-            var email = users?.Email;
 
             if (user == null)
                 return NotFound("Kişi Bulunumadı!");
 
-            if (company == null)
-                return NotFound("Kişi Bulunumadı!");
+
             BackWork model = new BackWork();
 
             model.DepartmentName = request.DepartmentName;
@@ -48,7 +43,6 @@ namespace Alesta03.Controllers.PersonController
 
             AddInfoWorkResponse response = new AddInfoWorkResponse();
 
-            response.CompanyEmail = email;
             response.DepartmentName = model.DepartmentName;
             response.EmployeeID = model.EmployeeID;
             response.AppLetter = model.AppLetter;
@@ -77,6 +71,7 @@ namespace Alesta03.Controllers.PersonController
             approval.Status = string.Empty;
             approval.BackWorkId = bpwid;
             approval.CompanyId = companyId;
+            approval.PersonId = pid;
 
             _context.ApprovalStatuses.Add(approval);
             await _context.SaveChangesAsync();
