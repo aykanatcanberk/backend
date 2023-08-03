@@ -29,6 +29,10 @@ namespace Alesta03.Controllers.PersonController
             if (user == null)
                 return NotFound("Kişi Bulunumadı!");
 
+            var company = _context.Companies.FirstOrDefault(x => x.ID == companyId);
+            var userId = company?.UsersId;
+            var cuser = _context.Users.FirstOrDefault(x => x.ID == userId);
+            var email = cuser?.Email;
 
             BackWork model = new BackWork();
 
@@ -48,7 +52,7 @@ namespace Alesta03.Controllers.PersonController
             response.AppLetter = model.AppLetter;
             response.Start = model.Start;
             response.End = model.End;
-
+            response.CompanyEmail = email;
 
             WorkStatus workStatus = new WorkStatus();
 
@@ -80,9 +84,21 @@ namespace Alesta03.Controllers.PersonController
         }
 
         [HttpGet("get all"), Authorize(Roles = Role.User)]
-        public async Task<ActionResult<List<BackWork>>> GetAll()
+        public async Task<ActionResult<List<WorkStatus>>> GetAll()
         {
-            var backEdu = await _context.BackWorks.ToListAsync();
+            //var mail = User?.Identity?.Name;
+            //var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == mail);
+            //var id = user?.ID;
+
+            //var person = await _context.People.FirstOrDefaultAsync(x => x.UsersId == id);
+            //var pid = person?.ID;
+
+            //var status = await _context.WorkStatuses
+            //    .Where(x => x.PersonId == pid)
+            //    .ToListAsync();
+
+            var backEdu = await _context.BackWorks
+                .ToListAsync();
 
             return Ok(backEdu);
         }

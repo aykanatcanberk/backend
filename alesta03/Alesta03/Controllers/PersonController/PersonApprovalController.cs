@@ -34,6 +34,18 @@ namespace Alesta03.Controllers.PersonController
 
             return Ok("İş Deneyiminiz Onaya Gönderildi");
         }
-         
+
+        [HttpGet("{backworkId}"), Authorize(Roles = Role.User)]
+        public async Task<ActionResult<string>> AppWorkControl(int backworkId)
+        {
+            var model = _context.ApprovalStatuses.FirstOrDefault(x => x.BackWorkId == backworkId);
+
+            if (model == null) return NotFound("Kişi Onay Durumu Bulunamadı!");
+
+            await _context.SaveChangesAsync();
+
+            return Ok(model.Status);
+        }
+
     }
 }
