@@ -90,6 +90,7 @@ namespace Alesta03.Controllers.CompanyController
             response.Phone = model.Phone;
             response.Website = model.Website;
 
+
             await _context.SaveChangesAsync();
 
             return Ok(response);

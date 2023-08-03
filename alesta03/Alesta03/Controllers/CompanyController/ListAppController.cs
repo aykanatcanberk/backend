@@ -85,7 +85,7 @@ namespace Alesta03.Controllers.CompanyController
 
             await _context.SaveChangesAsync();
 
-            return Ok("Deneyimi Onayladınız");
+            return Ok("Deneyimi Reddeddiniz");
         }
 
     }
