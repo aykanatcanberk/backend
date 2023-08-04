@@ -1,5 +1,10 @@
-﻿using Alesta03.Request.PostRequest;
+﻿using Alesta03.Model;
+using Alesta03.Request.AddRequest;
+using Alesta03.Request.PostRequest;
+using Alesta03.Request.UpdateRequest;
+using Alesta03.Response.AdvertApproval_Response;
 using Alesta03.Response.PostResponse;
+using Alesta03.Services.PostServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,20 +24,21 @@ namespace Alesta03.Controllers.GeneralController
         }
 
         [HttpGet("AllPosts"), Authorize]
-        public async Task<ActionResult<Post>> GetAllPosts()
+        public async Task<ActionResult<List<GetPostResponse>>> GetAllPosts()
         {
-            var Posts = await _context.Posts.ToListAsync();
+            var posts = await _context.Posts.ToListAsync();
             var responseList = new List<GetPostResponse>();
 
-            foreach (var post in Posts)
+            var usersIds = posts.Select(p => p.UserId).Distinct();
+
+            foreach (var userId in usersIds)
             {
-                var postid = post.UserId;
-                var person = _context.People.FirstOrDefault(y => y.UsersId == postid);
-                var comp = _context.Companies.FirstOrDefault(y => y.UsersId == postid);
+                var person = _context.People.FirstOrDefault(y => y.UsersId == userId);
+                var comp = _context.Companies.FirstOrDefault(y => y.UsersId == userId);
                 var name = person?.Name ?? comp?.Name;
 
-                var _post = await _context.Posts
-                    .Where(aa => aa.UserId == postid)
+                var userPosts = await _context.Posts
+                    .Where(aa => aa.UserId == userId)
                     .Select(aa => new GetPostResponse
                     {
                         Name = name,
@@ -40,11 +46,12 @@ namespace Alesta03.Controllers.GeneralController
                         PostDate = aa.PostDate,
                     }).ToListAsync();
 
-                responseList.AddRange(_post);
+                responseList.AddRange(userPosts);
             }
 
             return Ok(responseList);
         }
+
 
         [HttpGet("PersonPosts"), Authorize]
         public async Task<ActionResult<Post>> GetPersonPosts()
