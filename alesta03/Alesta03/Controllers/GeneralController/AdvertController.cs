@@ -22,7 +22,7 @@ namespace Alesta03.Controllers.GeneralController
         }
         [Route("api/[controller]/personpage")]
 
-        [HttpGet,Authorize]
+        [HttpGet, Authorize]
         public async Task<ActionResult<Advert>> GetAllAdvertPerson()
         {
             var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
@@ -92,26 +92,38 @@ namespace Alesta03.Controllers.GeneralController
         public async Task<ActionResult<List<Advert>>> AddAdvert(AddAdvertRequest request)
         {
             var userMail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
+            var user = _context.Users.FirstOrDefault(u => u.Email == userMail);
             var id = user?.ID;
-
             if (user == null)
                 return NotFound("Kullanıcı Bulunamadı!");
 
-            var company = _context.Companies.FirstOrDefault(u => u.ID == id);
+            var CompName = _context.Companies.FirstOrDefault(x => x.UsersId == id).Name;
+            var model = _context.Adverts.FirstOrDefault(x => x.UserId == id);
+            if (model is not null) return NotFound("Daha Bu İlan Atılmış.");
 
-            var newAdvert = new Advert
-            {
-                UserId = id,
-                CompanyName = "Aselsan",
-                AdvertName = request.AdvertName,
-                AdvertDate = DateTime.Now,
-                Description = request.Description,
-                AdvertType = request.AdvertType,
-                Department = request.Department,
-                WorkType = request.WorkType,
-                WorkPreference = request.WorkPreference
-            };
+            model.UserId = id;
+            model.CompanyName = "Aselsan";
+            model.AdvertName = request.AdvertName;
+            model.AdvertDate = DateTime.Now;
+            model.Description = request.Description;
+            model.AdvertType = request.AdvertType;
+            model.Department = request.Department;
+            model.WorkType = request.WorkType;
+            model.WorkPreference = request.WorkPreference;
 
+            _context.Adverts.Add(model);
+            await _context.SaveChangesAsync();
+
+            AddAdvertResponse response = new AddAdvertResponse();
+            response.CompanyName = model.CompanyName;
+            response.AdvertName = model.AdvertName;
+            response.AdvertDate = model.AdvertDate;
+            response.Description = model.Description;
+            response.AdvertType = model.AdvertType;
+            response.Department = model.Department;
+            response.WorkType = model.WorkType;
+            response.WorkPreference = model.WorkPreference;
+            return Ok(response);
         }
+    }
 }
