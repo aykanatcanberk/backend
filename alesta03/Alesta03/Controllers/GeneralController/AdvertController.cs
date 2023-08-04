@@ -22,7 +22,7 @@ namespace Alesta03.Controllers.GeneralController
         }
         [Route("api/[controller]/personpage")]
 
-        [HttpGet,Authorize]
+        [HttpGet, Authorize]
         public async Task<ActionResult<Advert>> GetAllAdvertPerson()
         {
             var adverts = await _context.Adverts.Where(advert => !advert.IsDeleted).ToListAsync();
@@ -62,14 +62,14 @@ namespace Alesta03.Controllers.GeneralController
             return Ok(adverts);
         }
 
-        [HttpGet,Authorize]
-        public async Task<ActionResult<Advert>> GetSingleAdvert()
+        [HttpGet("{idd}"), Authorize]
+        public async Task<ActionResult<Advert>> GetSingleAdvert(int idd)
         {
             var userMail = User?.Identity?.Name;
             var user = _context.Users.FirstOrDefault(x => x.Email == userMail);
             var id = user?.ID;
 
-            var AdvertId = _context.Adverts.FirstOrDefault(x => x.UserId == id).Id;
+            var AdvertId = idd;
             var model = await _context.Adverts.FindAsync(AdvertId);
             var control = model.IsDeleted;
             if (model is null)
@@ -102,7 +102,7 @@ namespace Alesta03.Controllers.GeneralController
             if (model is not null) return NotFound("Daha Bu İlan Atılmış.");
 
             model.UserId = id;
-            model.CompanyName = CompName;
+            model.CompanyName = "Aselsan";
             model.AdvertName = request.AdvertName;
             model.AdvertDate = DateTime.Now;
             model.Description = request.Description;
@@ -114,7 +114,7 @@ namespace Alesta03.Controllers.GeneralController
             _context.Adverts.Add(model);
             await _context.SaveChangesAsync();
 
-            AddAdvertResponse response = new AddAdvertResponse();           
+            AddAdvertResponse response = new AddAdvertResponse();
             response.CompanyName = model.CompanyName;
             response.AdvertName = model.AdvertName;
             response.AdvertDate = model.AdvertDate;
@@ -125,6 +125,5 @@ namespace Alesta03.Controllers.GeneralController
             response.WorkPreference = model.WorkPreference;
             return Ok(response);
         }
-
     }
 }
