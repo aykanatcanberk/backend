@@ -1,10 +1,5 @@
-﻿using Alesta03.Model;
-using Alesta03.Request.AddRequest;
-using Alesta03.Request.PostRequest;
-using Alesta03.Request.UpdateRequest;
-using Alesta03.Response.AdvertApproval_Response;
+﻿using Alesta03.Request.PostRequest;
 using Alesta03.Response.PostResponse;
-using Alesta03.Services.PostServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +21,6 @@ namespace Alesta03.Controllers.GeneralController
         [HttpGet("AllPosts"), Authorize]
         public async Task<ActionResult<Post>> GetAllPosts()
         {
-            var mail = User?.Identity?.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Email == mail);
-            var id = user?.ID;
-            if (user == null)
-                return NotFound("Gönderi Bulunamadı!");
-
             var Posts = await _context.Posts.ToListAsync();
             var responseList = new List<GetPostResponse>();
 
@@ -39,7 +28,8 @@ namespace Alesta03.Controllers.GeneralController
             {
                 var postid = post.UserId;
                 var person = _context.People.FirstOrDefault(y => y.UsersId == postid);
-                var name = person.Name;
+                var comp = _context.Companies.FirstOrDefault(y => y.UsersId == postid);
+                var name = person?.Name ?? comp?.Name;
 
                 var _post = await _context.Posts
                     .Where(aa => aa.UserId == postid)
@@ -64,42 +54,24 @@ namespace Alesta03.Controllers.GeneralController
             var id = user?.ID;
             if (user == null)
                 return NotFound("Gönderi Bulunamadı!");
+
             var model = _context.Posts.FirstOrDefault(x => x.UserId == id);
             if (model == null)
                 return NotFound("Gönderi Bilgisi Bulunamadı!");
-
-            var company=_context.Companies.FirstOrDefault(y => y.UsersId == id);
             var person = _context.People.FirstOrDefault(y => y.UsersId == id);
 
-           
-           
+            var name = person?.Name;
 
-            if(user.UserType=="Person")
-            {
-                var name = person.Name;
-                var _post = await _context.Posts
+            var _post = await _context.Posts
                 .Where(aa => aa.UserId == id)
                 .Select(aa => new GetPostResponse
                 {
+
                     Name = name,
                     Content = aa.Content,
                     PostDate = aa.PostDate,
                 }).ToListAsync();
             return Ok(_post);
-            }
-            else
-            {
-                var cname=company.Name;
-                 var _post = await _context.Posts
-                .Where(aa => aa.UserId == id)
-                .Select(aa => new GetPostResponse
-                {
-                    Name = cname,
-                    Content = aa.Content,
-                    PostDate = aa.PostDate,
-                }).ToListAsync();
-            return Ok(_post);
-            }  
         }
 
         [HttpPost, Authorize]
@@ -130,6 +102,8 @@ namespace Alesta03.Controllers.GeneralController
 
             return Ok(response);
         }
+
+
 
 
         [HttpDelete, Authorize]
