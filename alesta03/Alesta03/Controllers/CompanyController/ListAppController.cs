@@ -27,15 +27,11 @@ namespace Alesta03.Controllers.CompanyController
             var cid = company?.ID;
             var cname = company?.Name;           
 
-            var appStatus = _context.ApprovalStatuses.FirstOrDefault(u => u.CompanyId == cid);
-            var sta = appStatus?.Status;
+            var appStatus = await _context.BackWorks.ToListAsync();
+            
 
 
-            var app = await _context.WorkStatuses
-                .Where(x => sta == "b")
-                .ToListAsync();
-
-            return Ok(app);
+            return Ok(appStatus);
         }
 
 
